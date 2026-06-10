@@ -1,0 +1,704 @@
+/* ============================================================================
+   VARIABLES
+   ============================================================================ */
+
+:root {
+  color-scheme: dark;
+  --arcade-neon-rgb: 0, 153, 255;
+  --arcade-neon: rgb(var(--arcade-neon-rgb));
+  --arcade-bg: #05050a;
+  --arcade-black-rgb: 0, 0, 0;
+  --arcade-black: rgb(var(--arcade-black-rgb));
+  --arcade-white: #ffffff;
+  --arcade-red: #ff3131;
+  --arcade-medal-gold: #ffd700;
+  --arcade-medal-silver: #c0c0c0;
+  --arcade-medal-bronze: #cd7f32;
+  --arcade-frame: #121224;
+  --arcade-text: var(--arcade-neon);
+  --arcade-border: var(--arcade-neon);
+  --arcade-accent-rgb: 255, 204, 0;
+  --arcade-accent: rgb(var(--arcade-accent-rgb));
+}
+
+/* PIXEL RENDERING UTILS */
+.pixel-flag {
+  width: 62px;
+  height: 42px;
+  background-image: url('/flags-sprite.png'); /* Path to your spritesheet */
+  background-size: auto 42px; /* Width scales based on content, height is fixed */
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  border: 1px solid var(--arcade-black); /* Matching your pixel border description */
+  display: block; /* Changed to block for better control over dimensions */
+  flex-shrink: 0;
+}
+
+.pixel-flag.mini {
+  width: 31px; /* 50% scale for standings */
+  height: 21px;
+  background-size: auto 21px;
+}
+
+/* ============================================================================
+   MAIN CONTAINER & LAYOUT
+   ============================================================================ */
+
+.app-container {
+  max-width: 850px;
+  width: 100%;
+  border: 6px double var(--arcade-text);
+  background: var(--arcade-frame);
+  padding: 20px;
+  position: relative;
+  box-shadow: 0 0 30px rgba(var(--arcade-neon-rgb), 0.2);
+}
+
+/* ============================================================================
+   HEADER SECTION
+   ============================================================================ */
+
+.arcade-header {
+  text-align: center;
+  border-bottom: 4px dashed var(--arcade-text);
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+}
+
+.arcade-header h1 {
+  font-size: 28px;
+  margin: 0 0 8px 0;
+  color: var(--arcade-neon);
+  text-shadow: 3px 3px var(--arcade-black);
+  letter-spacing: 2px;
+}
+
+.arcade-header .subtitle {
+  margin: 0;
+  font-size: 10px;
+  color: var(--arcade-accent);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* ============================================================================
+   NAVIGATION
+   ============================================================================ */
+
+.arcade-nav {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0;
+  padding: 12px;
+  border: 2px solid var(--arcade-text);
+  background: rgba(var(--arcade-black-rgb), 0.3);
+  position: relative;
+  z-index: 10;
+}
+
+.nav-row {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.arcade-nav button {
+  background: transparent;
+  border: 2px solid var(--arcade-text);
+  color: var(--arcade-text);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  cursor: pointer;
+  padding: 8px 12px;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.arcade-nav button:hover {
+  color: var(--arcade-neon);
+  border-color: var(--arcade-neon);
+  box-shadow: 0 0 10px var(--arcade-neon);
+}
+
+.arcade-nav button.active-btn {
+  color: var(--arcade-neon);
+  border-color: var(--arcade-neon);
+  box-shadow: inset 0 0 8px var(--arcade-neon), 0 0 15px var(--arcade-neon);
+  background: rgba(var(--arcade-neon-rgb), 0.1);
+}
+
+.arcade-nav .reset-btn-nav {
+  border-color: var(--arcade-border);
+  color: var(--arcade-text);
+}
+
+/* ============================================================================
+   CONTENT AREA
+   ============================================================================ */
+
+.content-area {
+  min-height: 300px;
+}
+
+/* ============================================================================
+   MATCHES SECTION
+   ============================================================================ */
+
+.matches-container {
+  padding: 10px 0;
+}
+
+.section-title {
+  font-size: 14px;
+  margin: 0 0 16px 0;
+  text-align: center;
+  color: var(--arcade-accent);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 2px dashed var(--arcade-text);
+  padding-bottom: 8px;
+}
+
+.match-card {
+  background: var(--arcade-bg);
+  border: 3px solid var(--arcade-text);
+  padding: 12px;
+  margin-bottom: 12px;
+  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.5);
+  transition: all 0.2s;
+}
+
+.match-card:hover {
+  box-shadow: 0 0 15px rgba(var(--arcade-neon-rgb), 0.4);
+  border-color: var(--arcade-neon);
+  background: rgba(var(--arcade-neon-rgb), 0.03);
+}
+
+.match-meta {
+  font-size: 9px;
+  color: var(--arcade-accent);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.match-teams {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.team-input-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.team-info-wrapper {
+  display: flex;
+  align-items: center;
+  flex-direction: column; /* Stack flag above team name */
+  gap: 8px;
+}
+
+.team-code {
+  font-size: 12px;
+  color: var(--arcade-neon);
+  font-weight: bold;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+
+.team-info-wrapper:hover .team-code {
+  color: var(--arcade-white);
+  text-shadow: 0 0 8px var(--arcade-neon);
+}
+
+/* Score +/- Controls */
+.stat-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--arcade-black);
+  border: 2px solid var(--arcade-border);
+  padding: 4px;
+}
+
+.stat-display {
+  font-size: 20px;
+  color: var(--arcade-neon);
+  min-width: 40px;
+  text-align: center;
+  text-shadow: 0 0 5px var(--arcade-neon);
+}
+
+.stat-btn {
+  background: #222; /* Generic dark grey for button depth */
+  border: 1px solid var(--arcade-text);
+  color: var(--arcade-text);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.1s;
+  user-select: none;
+}
+
+.stat-btn:active {
+  background: var(--arcade-neon);
+  color: #000;
+  transform: translateY(2px);
+}
+
+.vs {
+  font-size: 11px;
+  color: var(--arcade-text);
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+/* ============================================================================
+   CARD CONTROLS (8-BIT STYLE)
+   ============================================================================ */
+
+.match-cards-ui {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.card-control-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.pixel-card-icon {
+  width: 14px;
+  height: 18px;
+  display: block !important;
+  flex-shrink: 0;
+  border: 1px solid var(--arcade-black);
+  border-radius: 1px;
+  min-width: 14px;
+  min-height: 18px;
+  background-clip: padding-box;
+  box-sizing: border-box;
+  /* Added an inset white border and a heavier bottom shadow for a 3D sprite look */
+  box-shadow: 
+    1px 1px 0px var(--arcade-white) inset, 
+    2px 2px 0px rgba(var(--arcade-black-rgb), 0.5);
+  
+  /* The magic properties for pixelation */
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -webkit-crisp-edges;
+  image-rendering: pixelated;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+
+.yellow-card {
+  /* 3-color palette: Gold highlight, Goldenrod base, Orange shadow */
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="4" height="6"><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="%23ffd700"/><stop offset="40%" stop-color="%23ffd700"/><stop offset="40%" stop-color="%23daa520"/><stop offset="70%" stop-color="%23daa520"/><stop offset="70%" stop-color="%23ff8c00"/><stop offset="100%" stop-color="%23ff8c00"/></linearGradient><rect width="100%" height="100%" fill="url(%23g)"/></svg>') !important;
+}
+
+.red-card {
+  /* 3-color palette: Orange Red highlight, Red base, Fire Brick shadow */
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="4" height="6"><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="%23ff4500"/><stop offset="40%" stop-color="%23ff4500"/><stop offset="40%" stop-color="%23ff0000"/><stop offset="70%" stop-color="%23ff0000"/><stop offset="70%" stop-color="%23b22222"/><stop offset="100%" stop-color="%23b22222"/></linearGradient><rect width="100%" height="100%" fill="url(%23g)"/></svg>') !important;
+}
+
+.arcade-counter {
+  display: flex;
+  align-items: center;
+  background: var(--arcade-black);
+  border: 1px solid var(--arcade-border);
+  padding: 3px;
+  gap: 4px;
+}
+
+.stat-btn {
+  /* Ensure no other layers are blocking clicks */
+  position: relative;
+  z-index: 5;
+  pointer-events: auto !important;
+}
+
+
+.stat-btn:hover { background: var(--arcade-neon); color: #000; }
+
+.stat-count {
+  width: 18px;
+  text-align: center;
+  font-size: 10px;
+  color: var(--arcade-neon);
+}
+
+/* ============================================================================
+   PENALTY SHOOTOUT
+   ============================================================================ */
+
+.penalty-shootout {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 2px dashed var(--arcade-text);
+  text-align: center;
+}
+
+.penalty-title {
+  font-size: 10px;
+  color: var(--arcade-neon);
+  margin-bottom: 12px;
+}
+
+.penalty-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+}
+
+.vs-pks {
+  font-size: 9px;
+  color: var(--arcade-accent);
+  font-weight: bold;
+}
+
+/* ============================================================================
+   STANDINGS SECTION
+   ============================================================================ */
+
+.standings-container {
+  padding: 10px 0;
+}
+
+.group-standings {
+  margin-bottom: 24px;
+}
+
+.group-title {
+  font-size: 12px;
+  margin: 0 0 12px 0;
+  text-align: center;
+  color: var(--arcade-neon);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border: 2px solid var(--arcade-border);
+  padding: 8px;
+  background: rgba(var(--arcade-neon-rgb), 0.1);
+}
+
+.standings-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 9px;
+  text-transform: uppercase;
+  table-layout: fixed;
+}
+
+.standings-table thead {
+  background: rgba(var(--arcade-black-rgb), 0.5);
+  border: 2px solid var(--arcade-text);
+}
+
+.standings-table th {
+  padding: 8px 4px;
+  text-align: center;
+  color: var(--arcade-neon);
+  font-weight: bold;
+  border-right: 1px solid var(--arcade-text);
+}
+
+/* Fixed column widths */
+.standings-table th:nth-child(1) { width: 45px; } /* POS */
+.standings-table th:nth-child(2) { width: auto; } /* TEAM (Widest) */
+.standings-table th:nth-child(3) { width: 45px; } /* MP */
+.standings-table th:nth-child(4) { width: 85px; } /* W-D-L */
+.standings-table th:nth-child(5) { width: 45px; } /* GF */
+.standings-table th:nth-child(6) { width: 45px; } /* GA */
+.standings-table th:nth-child(7) { width: 45px; } /* GD */
+.standings-table th:nth-child(8) { width: 50px; } /* PTS */
+
+.standings-table th:last-child {
+  border-right: none;
+}
+
+.standings-table tbody tr {
+  border-bottom: 1px dotted var(--arcade-text);
+  transition: all 0.2s;
+}
+
+.standings-table tbody tr:hover {
+  background: rgba(var(--arcade-neon-rgb), 0.1);
+  border-color: var(--arcade-neon);
+}
+
+.standings-table tbody tr.clinched-row {
+  background: rgba(var(--arcade-neon-rgb), 0.07);
+  box-shadow: inset 4px 0 0 var(--arcade-neon);
+}
+
+.standings-table td {
+  padding: 8px 4px;
+  text-align: center;
+  border-right: 1px solid rgba(var(--arcade-white-rgb), 0.1);
+}
+
+.standings-table td:last-child {
+  border-right: none;
+}
+
+.standings-table .position {
+  color: var(--arcade-neon);
+  font-weight: bold;
+  font-size: 10px;
+}
+
+.standings-table .team-name {
+  text-align: left;
+  color: var(--arcade-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.third-rank-indicator {
+  font-size: 7px;
+  color: var(--arcade-accent);
+  margin-left: 2px;
+  text-shadow: 0 0 3px var(--arcade-accent);
+}
+
+.standings-table .points-cell {
+  color: var(--arcade-neon);
+  font-weight: bold;
+  font-size: 11px;
+}
+
+.standings-table .position-1 td:first-child {
+  color: var(--arcade-medal-gold);
+  text-shadow: 0 0 5px var(--arcade-medal-gold);
+}
+
+.standings-table .position-2 td:first-child {
+  color: var(--arcade-medal-silver);
+}
+
+.standings-table .position-3 td:first-child {
+  color: var(--arcade-medal-bronze);
+}
+
+/* ============================================================================
+   RESPONSIVE
+   ============================================================================ */
+
+@media (max-width: 480px) {
+  .app-container {
+    padding: 12px;
+    border-width: 4px;
+  }
+
+  .arcade-header h1 {
+    font-size: 20px;
+  }
+
+  .arcade-nav {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .arcade-nav button {
+    width: 100%;
+  }
+
+  .standings-table {
+    font-size: 8px;
+  }
+
+  input[type='number'] {
+    width: 50px;
+    height: 35px;
+    font-size: 14px;
+  }
+}
+
+.lang-switcher {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.lang-switcher button {
+  background: transparent;
+  border: 1px solid var(--arcade-text);
+  color: var(--arcade-text);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  cursor: pointer;
+  padding: 4px 6px;
+}
+
+.lang-switcher button.active-lang {
+  color: var(--arcade-neon);
+  border-color: var(--arcade-neon);
+  box-shadow: inset 0 0 8px var(--arcade-neon), 0 0 15px var(--arcade-neon);
+  background: rgba(var(--arcade-neon-rgb), 0.1);
+}
+
+/* ============================================================================
+   FILTERS (DATE/VENUE)
+   ============================================================================ */
+
+ .arcade-filters {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  align-items: center;
+  margin-bottom: 24px;
+  padding: 12px;
+  background: rgba(var(--arcade-black-rgb), 0.2);
+  border: 1px solid var(--arcade-text);
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filter-group label {
+  font-size: 8px;
+  color: var(--arcade-accent);
+}
+
+.custom-select-container {
+  position: relative;
+  min-width: 200px;
+  z-index: 100;
+}
+
+.select-trigger {
+  width: 100%;
+  background: var(--arcade-black);
+  border: 2px solid var(--arcade-text);
+  color: var(--arcade-neon);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  padding: 8px;
+  text-transform: uppercase;
+  text-align: left;
+  cursor: pointer;
+}
+
+.select-trigger:hover {
+  border-color: var(--arcade-neon);
+  box-shadow: 0 0 10px var(--arcade-neon);
+}
+
+.select-dropdown {
+  position: absolute;
+  top: 100%;
+  left: -2px;
+  width: calc(100% + 4px);
+  background: var(--arcade-black);
+  border: 2px solid var(--arcade-neon);
+  display: flex;
+  flex-direction: column;
+  max-height: 200px;
+  overflow-y: auto;
+  box-shadow: 0 10px 20px rgba(var(--arcade-black-rgb), 0.8);
+  scrollbar-width: thin;
+  scrollbar-color: var(--arcade-neon) #000;
+}
+
+.select-dropdown::-webkit-scrollbar {
+  width: 8px;
+}
+
+.select-dropdown::-webkit-scrollbar-track {
+  background: var(--arcade-black);
+}
+
+.select-dropdown::-webkit-scrollbar-thumb {
+  background: var(--arcade-neon);
+  border: 1px solid var(--arcade-black);
+}
+
+.select-option {
+  background: transparent;
+  border: none;
+  color: var(--arcade-text);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  padding: 12px 8px;
+  text-align: left;
+  cursor: pointer;
+  text-transform: uppercase;
+  width: 100%;
+  display: block;
+}
+
+.select-option:hover, .select-option.active-option {
+  background: rgba(var(--arcade-neon-rgb), 0.2);
+  color: var(--arcade-neon);
+}
+
+.arcade-footer {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 2px solid var(--arcade-text);
+  text-align: center;
+  font-size: 7px;
+  color: rgba(var(--arcade-neon-rgb), 0.5);
+  line-height: 1.6;
+}
+
+.arcade-error-banner {
+  background: var(--arcade-red);
+  color: var(--arcade-white);
+  border: 4px solid var(--arcade-white);
+  padding: 15px;
+  margin-bottom: 24px;
+  text-align: center;
+  font-family: 'Press Start 2P', monospace;
+  box-shadow: 0 0 20px var(--arcade-red);
+  animation: arcade-error-flash 0.5s step-end infinite;
+}
+
+@keyframes arcade-error-flash {
+  0%, 100% { background: var(--arcade-red); }
+  50% { background: #660000; }
+}
+
+.footer-credits {
+  margin-top: 10px;
+}
+
+.footer-credits a {
+  color: var(--arcade-neon);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--arcade-neon);
+  opacity: 0.7;
+}
+
+.footer-credits a:hover {
+  opacity: 1;
+  text-shadow: 0 0 5px var(--arcade-neon);
+}

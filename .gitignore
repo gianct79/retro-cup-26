@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+.netlify/
+
+# System files
+.DS_Store
+Thumbs.db
+*.log
+
+# Environment and local config
+.env
+.env.*
+*.local
+
+# Python Tooling (needed for tools/flags sprite generator)
+.venv
+venv/
+env/
+__pycache__/
+*.pyc
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
