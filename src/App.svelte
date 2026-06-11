@@ -2,7 +2,10 @@
   import initialData from './data.json';
   import thirdPlaceData from './3rd_place_data.json';
   import i18n from './i18n.json';
-  import './styles/app.css';
+  import './styles/app.css'; // Ensure this is imported before any component-specific styles if they override global ones
+  import FilterSelect from './components/FilterSelect.svelte';
+  import MatchCard from './components/MatchCard.svelte';
+  import StandingsTable from './components/StandingsTable.svelte';
 
   // --- STATE (RUNES) ---
   const STORAGE_KEY = 'retro_cup_26';
@@ -10,7 +13,6 @@
   function initMatches() {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
-      if (!saved) return structuredClone(initialData.matches.group_stage);
       const parsed = JSON.parse(saved);
       return Array.isArray(parsed) ? parsed : structuredClone(initialData.matches.group_stage);
     } catch (e) {
@@ -20,13 +22,11 @@
 
   let matches = $state(initMatches());
   let currentTab = $state('matches'); // matches, r32, r16, qf, sf, third, final, standings
-  let selectedVenue = $state(null);
-  let selectedDate = $state('all');
-  let isDateFilterOpen = $state(false);
-  let isVenueFilterOpen = $state(false);
-  let venueFilterContainer = $state();
+  let selectedVenue = $state(null); // null for 'all venues'
+  let selectedDate = $state('all'); // 'all' for 'all dates'
+  let selectedGroup = $state(null); // null for 'all groups'
+  let selectedTeam = $state(null); // null for 'all teams'
   let locale = $state('en'); // 'en' or 'pt'
-  let dateFilterContainer = $state();
 
   // --- UTILS ---
   const t = $derived(i18n[locale]);
@@ -102,9 +102,9 @@
   $effect(() => {
     currentTab;
     selectedDate = 'all';
-    isDateFilterOpen = false;
     selectedVenue = null;
-    isVenueFilterOpen = false;
+    selectedGroup = null;
+    selectedTeam = null;
   });
 
   // --- LOGIC ---
@@ -220,6 +220,26 @@
     return ['all', ...dates];
   });
 
+  // Extract unique groups for filtering
+  let groupOptions = $derived.by(() => {
+    const groups = Object.keys(initialData.groups).sort();
+    return [
+      { id: null, label: t.ui.all_groups },
+      ...groups.map(g => ({ id: g, label: `${t.standings.group} ${g}` }))
+    ];
+  });
+
+  // Extract all teams for filtering
+  let teamOptions = $derived.by(() => {
+    const teams = Object.keys(initialData.teams).map(code => ({
+      id: code,
+      label: t.teams[code] || code
+    })).sort((a, b) => a.label.localeCompare(b.label));
+    return [
+      { id: null, label: t.ui.all_teams },
+      ...teams
+    ];
+  });
   // Count matches per date in the current pool
   let activeMatchCounts = $derived.by(() => {
     const counts = { all: activeMatchesPool.length };
@@ -421,181 +441,35 @@
   ]);
 </script>
 
-<svelte:window 
-  onclick={(e) => {
-    if (isDateFilterOpen && dateFilterContainer && !dateFilterContainer.contains(e.target)) {
-      isDateFilterOpen = false;
-    }
-    if (isVenueFilterOpen && venueFilterContainer && !venueFilterContainer.contains(e.target)) {
-      isVenueFilterOpen = false;
-    }
-  }} 
-  onkeydown={(e) => {
-    if (e.key === 'Escape' && isDateFilterOpen) {
-      isDateFilterOpen = false;
-    }
-    if (e.key === 'Escape' && isVenueFilterOpen) {
-      isVenueFilterOpen = false;
-    }
-  }}
-/>
-
-{#snippet venueFilterUI()}
-  {#if activeVenues.length > 2}
-    <div class="filter-group">
-      <label for="venue-select">{t.ui.select_venue}</label>
-      <div class="custom-select-container" bind:this={venueFilterContainer}>
-        <button 
-          class="select-trigger" 
-          aria-haspopup="listbox"
-          aria-expanded={isVenueFilterOpen}
-          onclick={() => isVenueFilterOpen = !isVenueFilterOpen}
-        >
-          {initialData.venues[selectedVenue] || t.ui.all_venues}
-        </button>
-        {#if isVenueFilterOpen}
-          <div class="select-dropdown" role="listbox">
-            <button 
-              role="option"
-              aria-selected={selectedVenue === null}
-              class="select-option" 
-              class:active-option={selectedVenue === null}
-              onclick={() => { selectedVenue = null; isVenueFilterOpen = false; }}
-            >
-              {t.ui.all_venues}
-            </button>
-            {#each activeVenues.filter(v => v !== null) as code}
-              {@const name = initialData.venues[code] || code}
-              <button 
-                role="option"
-                aria-selected={selectedVenue === code}
-                class="select-option" 
-                class:active-option={selectedVenue === code}
-                onclick={() => { selectedVenue = code; isVenueFilterOpen = false; }}
-              >
-                {name}
-              </button>
-            {/each}
-          </div>
-        {/if}
-      </div>
-    </div>
-  {/if}
-{/snippet}
-
-{#snippet teamStatControls(matchId, team, teamKey, onUpdate)}
-  <div class="team-input-group">
-    <div class="team-info-wrapper">
-      {#if team.code !== 'TBD'}
-        <div 
-          class="pixel-flag mini" 
-          style="background-position: -{teamCodes.indexOf(team.code) * 31}px 0px;"
-          aria-label="{t.teams[team.code]} flag"
-        ></div>
-      {/if}
-      <span class="team-code">
-        {team.code !== 'TBD' ? (t.teams[team.code] || team.code) : t.ui.tbd}
-      </span>
-    </div>
-
-    {#if team.code !== 'TBD'}
-      <div class="stat-control">
-        <button type="button" class="stat-btn" onclick={() => onUpdate(matchId, teamKey, 'score', -1)}>-</button>
-        <span class="stat-display">{team.score}</span>
-        <button type="button" class="stat-btn" onclick={() => onUpdate(matchId, teamKey, 'score', 1)}>+</button>
-      </div>
-      <div class="match-cards-ui">
-        <div class="card-control-item">
-          <div class="pixel-card-icon yellow-card"></div>
-          <div class="arcade-counter">
-            <button type="button" class="stat-btn" onclick={() => onUpdate(matchId, teamKey, 'yellow_cards', -1)}>-</button>
-            <span class="stat-count">{team.yellow_cards || 0}</span>
-            <button type="button" class="stat-btn" onclick={() => onUpdate(matchId, teamKey, 'yellow_cards', 1)}>+</button>
-          </div>
-        </div>
-        <div class="card-control-item">
-          <div class="pixel-card-icon red-card"></div>
-          <div class="arcade-counter">
-            <button type="button" class="stat-btn" onclick={() => onUpdate(matchId, teamKey, 'red_cards', -1)}>-</button>
-            <span class="stat-count">{team.red_cards || 0}</span>
-            <button type="button" class="stat-btn" onclick={() => onUpdate(matchId, teamKey, 'red_cards', 1)}>+</button>
-          </div>
-        </div>
-      </div>
-    {/if}
-  </div>
-{/snippet}
-
-{#snippet matchCard(match, onUpdate)}
-  <div class="match-card">
-    <div class="match-meta">{t.ui.match_label} #{match.id} // {formatDate(match.date)} // {initialData.venues[match.venue] || match.venue}</div>
-    <div class="match-teams {match.id > 72 ? 'knockout-teams' : ''}">
-      {@render teamStatControls(match.id, match.team1, 'team1', onUpdate)}
-      <span class="vs">vs</span>
-      {@render teamStatControls(match.id, match.team2, 'team2', onUpdate)}
-    </div>
-
-    {#if match.id > 72 && match.team1.code !== 'TBD' && match.team2.code !== 'TBD' && match.team1.score === match.team2.score}
-      <div class="penalty-shootout">
-        <p class="penalty-title">{t.status.penalties}</p>
-        <div class="penalty-controls">
-          <div class="stat-control">
-            <button type="button" class="stat-btn" onclick={() => onUpdate(match.id, 'team1', 'penalties', -1)}>-</button>
-            <span class="stat-display">{match.team1.penalties || 0}</span>
-            <button type="button" class="stat-btn" onclick={() => onUpdate(match.id, 'team1', 'penalties', 1)}>+</button>
-          </div>
-          <span class="vs-pks">{t.status.pks}</span>
-          <div class="stat-control">
-            <button type="button" class="stat-btn" onclick={() => onUpdate(match.id, 'team2', 'penalties', -1)}>-</button>
-            <span class="stat-display">{match.team2.penalties || 0}</span>
-            <button type="button" class="stat-btn" onclick={() => onUpdate(match.id, 'team2', 'penalties', 1)}>+</button>
-          </div>
-        </div>
-      </div>
-    {/if}
-  </div>
-{/snippet}
-
-{#snippet dateFilterUI()}
-  {#if activeDates.length > 2}
-    <div class="filter-group">
-      <label for="date-select">{t.ui.filter_by}</label>
-      <div class="custom-select-container" bind:this={dateFilterContainer}>
-        <button 
-          class="select-trigger" 
-          aria-haspopup="listbox"
-          aria-expanded={isDateFilterOpen}
-          onclick={() => isDateFilterOpen = !isDateFilterOpen}
-        >
-          {formatShortDate(selectedDate)} [{activeMatchCounts[selectedDate]}]
-        </button>
-        {#if isDateFilterOpen}
-          <div class="select-dropdown" role="listbox">
-            {#each activeDates as date}
-              <button 
-                role="option"
-                aria-selected={selectedDate === date}
-                class="select-option" 
-                class:active-option={selectedDate === date}
-                onclick={() => { selectedDate = date; isDateFilterOpen = false; }}
-              >
-                {formatShortDate(date)} [{activeMatchCounts[date]}]
-              </button>
-            {/each}
-          </div>
-        {/if}
-      </div>
-    </div>
-  {/if}
-{/snippet}
-
 {#snippet globalFiltersUI()}
-  {#if activeDates.length > 2 || activeVenues.length > 2}
-    <div class="arcade-filters">
-      {@render dateFilterUI()}
-      {@render venueFilterUI()}
-    </div>
-  {/if}
+  <div class="arcade-filters">
+    <FilterSelect 
+      label={t.ui.filter_by} 
+      options={activeDates.map(d => ({ id: d, label: formatShortDate(d) + (d !== 'all' ? ` [${activeMatchCounts[d]}]` : '') }))} 
+      bind:value={selectedDate} 
+      placeholder={t.ui.all_dates} 
+    />
+    <FilterSelect 
+      label={t.ui.select_venue} 
+      options={activeVenues.filter(v => v !== null).map(v => ({ id: v, label: initialData.venues[v] || v }))} 
+      bind:value={selectedVenue} 
+      placeholder={t.ui.all_venues} 
+    />
+    {#if currentTab === 'matches'}
+      <FilterSelect 
+        label={t.ui.filter_group} 
+        options={groupOptions} 
+        bind:value={selectedGroup} 
+        placeholder={t.ui.all_groups} 
+      />
+      <FilterSelect 
+        label={t.ui.filter_team} 
+        options={teamOptions} 
+        bind:value={selectedTeam} 
+        placeholder={t.ui.all_teams} 
+      />
+    {/if}
+  </div>
 {/snippet}
 
 <div class="app-container">
@@ -616,9 +490,6 @@
       <button class:active-btn={currentTab === 'standings'} onclick={() => currentTab = 'standings'}>
         [ {tabLabels.standings} ]
       </button>
-      <button class="reset-btn-nav" onclick={resetData}>
-        [ {t.ui.reset} ]
-      </button>
     </div>
     <div class="nav-row">
       <button class:active-btn={currentTab === 'r32'} onclick={() => currentTab = 'r32'}>[ {tabLabels.r32} ]</button>
@@ -629,6 +500,11 @@
       <button class:active-btn={currentTab === 'sf'} onclick={() => currentTab = 'sf'}>[ {tabLabels.sf} ]</button>
       <button class:active-btn={currentTab === 'third'} onclick={() => currentTab = 'third'}>[ {tabLabels.third} ]</button>
       <button class:active-btn={currentTab === 'final'} onclick={() => currentTab = 'final'}>[ {tabLabels.final} ]</button>
+    </div>
+    <div class="nav-row">
+      <button class="reset-btn-nav" onclick={resetData}>
+        [ {t.ui.reset} ]
+      </button>
     </div>
   </nav>
 
@@ -648,53 +524,31 @@
 
         {#each activeMatchesPool.filter(m => 
           (selectedDate === 'all' || m.date?.startsWith(selectedDate)) && 
-          (!selectedVenue || m.venue === selectedVenue)
+          (!selectedVenue || m.venue === selectedVenue) &&
+          (!selectedGroup || initialData.teams[m.team1.code]?.group === selectedGroup) &&
+          (!selectedTeam || m.team1.code === selectedTeam || m.team2.code === selectedTeam)
         ) as match (match.id)}
-          {@render matchCard(match, updateMatchData)}
+          <MatchCard 
+            {match} 
+            {t} 
+            {teamCodes} 
+            venues={initialData.venues} 
+            onUpdate={updateMatchData} 
+            {formatDate} 
+          />
         {/each}
       </div>
     {:else}
       <div class="standings-container">
         {#each Object.entries(groupsWithStandings) as [groupName, teams]}
-          <div class="group-standings">
-            <h3 class="group-title">[ {t.standings.group} {groupName} ]</h3>
-            <table class="standings-table">
-              <thead>
-                <tr>
-                  <th>{t.standings.pos}</th>
-                  <th>{t.standings.team}</th>
-                  <th>{t.standings.mp}</th>
-                  <th>{t.standings.wdl}</th>
-                  <th>{t.standings.gf}</th>
-                  <th>{t.standings.ga}</th>
-                  <th>{t.standings.gd}</th>
-                  <th>{t.standings.pts}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {#each teams as team, i}
-                  {@const isQualified = Object.values(qualifiers).includes(team.code)}
-                  <tr class="position-{i + 1} {isQualified ? 'clinched-row' : ''}">
-                    <td class="position">{i + 1}</td>
-                    <td class="team-name">
-                      <div 
-                        class="pixel-flag mini" 
-                        style="background-position: -{teamCodes.indexOf(team.code) * 31}px 0px;"
-                        aria-label="{t.teams[team.code]} flag"></div>
-                      <span>{team.name || team.code}</span>
-                      {#if bestThirdsRankMap[team.code]}<sup class="third-rank-indicator">{bestThirdsRankMap[team.code]}</sup>{/if}
-                    </td>
-                    <td>{team.mp}</td>
-                    <td>{team.w}-{team.d}-{team.l}</td>
-                    <td>{team.gf}</td>
-                    <td>{team.ga}</td>
-                    <td>{team.gd > 0 ? '+' : ''}{team.gd}</td>
-                    <td class="points-cell">{team.pts}</td>
-                  </tr>
-                {/each}
-              </tbody>
-            </table>
-          </div>
+          <StandingsTable 
+            {groupName} 
+            {teams} 
+            {t} 
+            {teamCodes} 
+            {qualifiers} 
+            {bestThirdsRankMap} 
+          />
         {/each}
       </div>
     {/if}

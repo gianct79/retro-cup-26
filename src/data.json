@@ -163,7 +163,7 @@
       { "id": 76, "date": "2026-06-29T17:00:00Z", "venue": "USA-HOU", "homeSlot": "1C", "awaySlot": "2F",     "team1": { "code": "", "score": 0 }, "team2": { "code": "", "score": 0 }, "played": false },
 
       { "id": 77, "date": "2026-06-29T21:00:00Z", "venue": "USA-NYJ", "homeSlot": "1I", "awaySlot": "3CDFGH", "team1": { "code": "", "score": 0 }, "team2": { "code": "", "score": 0 }, "played": false },
-      { "id": 78, "date": "2026-06-30T17:00:00Z", "venue": "USA-DAL", "homeSlot": "2E", "awaySlot": "I2",     "team1": { "code": "", "score": 0 }, "team2": { "code": "", "score": 0 }, "played": false },
+      { "id": 78, "date": "2026-06-30T17:00:00Z", "venue": "USA-DAL", "homeSlot": "2E", "awaySlot": "2I",     "team1": { "code": "", "score": 0 }, "team2": { "code": "", "score": 0 }, "played": false },
       { "id": 79, "date": "2026-07-01T01:00:00Z", "venue": "MEX-AZT", "homeSlot": "1A", "awaySlot": "3CEFHI", "team1": { "code": "", "score": 0 }, "team2": { "code": "", "score": 0 }, "played": false },
       { "id": 80, "date": "2026-07-01T17:00:00Z", "venue": "USA-ATL", "homeSlot": "1L", "awaySlot": "3EHIJK", "team1": { "code": "", "score": 0 }, "team2": { "code": "", "score": 0 }, "played": false },
 

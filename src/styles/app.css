@@ -347,6 +347,8 @@
   color: var(--arcade-neon);
 }
 
+.short-name { display: none; }
+
 /* ============================================================================
    PENALTY SHOOTOUT
    ============================================================================ */
@@ -507,35 +509,9 @@
    RESPONSIVE
    ============================================================================ */
 
-@media (max-width: 480px) {
-  .app-container {
-    padding: 12px;
-    border-width: 4px;
-  }
-
-  .arcade-header h1 {
-    font-size: 20px;
-  }
-
-  .arcade-nav {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .arcade-nav button {
-    width: 100%;
-  }
-
-  .standings-table {
-    font-size: 8px;
-  }
-
-  input[type='number'] {
-    width: 50px;
-    height: 35px;
-    font-size: 14px;
-  }
-}
+/* ============================================================================
+   RESPONSIVE (MOBILE & PORTRAIT) - Moved to end of file for priority
+   ============================================================================ */
 
 .lang-switcher {
   margin-top: 10px;
@@ -592,6 +568,10 @@
   position: relative;
   min-width: 200px;
   z-index: 100;
+}
+
+.custom-select-container.is-open {
+  z-index: 1001;
 }
 
 .select-trigger {
@@ -701,4 +681,139 @@
 .footer-credits a:hover {
   opacity: 1;
   text-shadow: 0 0 5px var(--arcade-neon);
+}
+
+@media (max-width: 768px) {
+  .arcade-filters {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+  }
+
+  .filter-group {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+
+  .custom-select-container {
+    width: 100%;
+    min-width: unset;
+  }
+
+  .nav-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 600px) {
+  .app-container {
+    padding: 12px;
+    border-width: 3px;
+  }
+
+  .arcade-header h1 {
+    font-size: 18px;
+  }
+
+  .match-teams {
+    gap: 4px;
+  }
+
+  .team-code {
+    font-size: 10px;
+  }
+
+  .stat-display {
+    font-size: 16px;
+    min-width: 30px;
+  }
+
+  .stat-btn {
+    width: 24px;
+    height: 24px;
+    font-size: 10px;
+  }
+
+  .pixel-flag {
+    width: 46px;
+    height: 31px;
+    background-size: auto 31px;
+  }
+
+  .standings-table {
+    font-size: 8px;
+  }
+
+  /* Adjust column widths for better mobile readability */
+  .standings-table th:nth-child(1), /* POS */
+  .standings-table td:nth-child(1) {
+    width: 30px; /* Smaller for POS */
+  }
+
+  .standings-table th:nth-child(2), /* TEAM */
+  .standings-table td:nth-child(2) {
+    width: auto; /* Let it take remaining space */
+  }
+
+  .standings-table th:nth-child(3), /* MP */
+  .standings-table td:nth-child(3) {
+    width: 25px; /* Smaller for MP (single digit) */
+  }
+
+  .standings-table th:nth-child(4), /* W-D-L */
+  .standings-table td:nth-child(4) {
+    width: 50px; /* Smaller for W-D-L (e.g., "1-0-0") */
+  }
+
+  .standings-table th:nth-child(7), /* GD */
+  .standings-table td:nth-child(7) {
+    width: 30px; /* Smaller for GD (e.g., "+0") */
+  }
+
+  .standings-table th:nth-child(8), /* PTS */
+  .standings-table td:nth-child(8) {
+    width: 35px; /* Smaller for PTS (e.g., "3") */
+  }
+
+  /* Hide less critical columns on small mobile */
+  .standings-table th:nth-child(5), 
+  .standings-table td:nth-child(5),
+  .standings-table th:nth-child(6), 
+  .standings-table td:nth-child(6) {
+    display: none;
+  }
+
+  input[type='number'] {
+    width: 50px;
+    height: 35px;
+    font-size: 14px;
+  }
+
+  .match-cards-ui {
+    gap: 6px;
+  }
+
+  .arcade-counter {
+    padding: 2px;
+    gap: 2px;
+  }
+
+  .arcade-counter .stat-btn {
+    width: 20px;
+    height: 20px;
+    font-size: 8px;
+  }
+
+  .full-name { display: none; }
+  .short-name { display: inline; }
+}
+
+@media (max-width: 480px) {
+  .arcade-nav button {
+    width: 100%;
+    font-size: 8px;
+    padding: 6px 8px;
+  }
 }
