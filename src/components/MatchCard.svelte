@@ -17,7 +17,7 @@
     <!-- Team 1 -->
     <div class="team-input-group">
       <div class="team-info-wrapper">
-        <PixelFlag code={match.team1.code} {teamCodes} mini={true} alt={t.teams[match.team1.code]} />
+        <PixelFlag code={match.team1.code} {teamCodes} alt={t.teams[match.team1.code]} />
         <div class="team-name-container">
           <span class="team-code full-name">{match.team1.code !== 'TBD' ? (t.teams[match.team1.code] || match.team1.code) : t.ui.tbd}</span>
           <span class="team-code short-name">{match.team1.code}</span>
@@ -56,7 +56,7 @@
     <!-- Team 2 -->
     <div class="team-input-group">
       <div class="team-info-wrapper">
-        <PixelFlag code={match.team2.code} {teamCodes} mini={true} alt={t.teams[match.team2.code]} />
+        <PixelFlag code={match.team2.code} {teamCodes} alt={t.teams[match.team2.code]} />
         <div class="team-name-container">
           <span class="team-code full-name">{match.team2.code !== 'TBD' ? (t.teams[match.team2.code] || match.team2.code) : t.ui.tbd}</span>
           <span class="team-code short-name">{match.team2.code}</span>

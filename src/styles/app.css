@@ -33,12 +33,14 @@
   border: 1px solid var(--arcade-black); /* Matching your pixel border description */
   display: block; /* Changed to block for better control over dimensions */
   flex-shrink: 0;
+  background-position: calc(var(--flag-index, 0) * -62px) 0;
 }
 
 .pixel-flag.mini {
   width: 31px; /* 50% scale for standings */
   height: 21px;
   background-size: auto 21px;
+  background-position: calc(var(--flag-index, 0) * -31px) 0;
 }
 
 /* ============================================================================
@@ -740,6 +742,8 @@
     width: 46px;
     height: 31px;
     background-size: auto 31px;
+    /* Calculate offset based on the new scaled width (~45.7px) */
+    background-position: calc(var(--flag-index, 0) * -45.76px) 0;
   }
 
   .standings-table {
