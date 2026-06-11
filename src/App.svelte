@@ -43,7 +43,9 @@
 
   const formatShortDate = (dateStr) => {
     if (dateStr === 'all') return t.ui.all_dates;
-    return new Date(dateStr + 'T12:00:00Z').toLocaleDateString(langTag, {
+    const [y, m, d] = dateStr.split('-').map(Number);
+    const date = new Date(y, m - 1, d); // Parse as local time to avoid TZ shifts
+    return date.toLocaleDateString(langTag, {
       weekday: 'short', month: 'short', day: 'numeric'
     }).toUpperCase();
   };
