@@ -121,6 +121,77 @@
     }
   }
 
+  function exportData() {
+    const data = JSON.stringify({ matches, locale });
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `retro-cup-26-save.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function handleImport(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const parsed = JSON.parse(e.target.result);
+        if (parsed.matches) matches = parsed.matches;
+        if (parsed.locale) locale = parsed.locale;
+      } catch (err) {
+        alert(t.ui.machine_error);
+      }
+    };
+    reader.readAsText(file);
+    event.target.value = ''; // Reset input
+  }
+
+  function simulateGroupStage() {
+    if (!confirm(t.ui.simulate_confirm)) return;
+    matches = matches.map(m => m.id <= 72 ? { ...m, played: true, team1: { ...m.team1, score: Math.floor(Math.random() * 4) }, team2: { ...m.team2, score: Math.floor(Math.random() * 4) } } : m);
+  }
+
+  async function syncOfficialResults() {
+    if (!confirm(t.ui.sync_confirm)) return;
+    try {
+      // Expects a results.json file in the public folder or root
+      const response = await fetch('./results.json');
+      if (!response.ok) throw new Error();
+      const officialData = await response.json();
+
+      matches = matches.map(m => {
+        const official = officialData.find(om => om.id === m.id);
+        if (official) {
+          return {
+            ...m,
+            played: true,
+            team1: { 
+              ...m.team1, 
+              score: official.team1?.score ?? 0, 
+              penalties: official.team1?.penalties ?? 0,
+              yellow_cards: official.team1?.yellow_cards ?? 0,
+              red_cards: official.team1?.red_cards ?? 0
+            },
+            team2: { 
+              ...m.team2, 
+              score: official.team2?.score ?? 0, 
+              penalties: official.team2?.penalties ?? 0,
+              yellow_cards: official.team2?.yellow_cards ?? 0,
+              red_cards: official.team2?.red_cards ?? 0
+            }
+          };
+        }
+        return m;
+      });
+      alert(t.ui.sync_success);
+    } catch (err) {
+      alert(t.ui.machine_error);
+    }
+  }
+
   /**
    * Unified mutator for all match data. 
    * Handles both group stage and dynamic knockout matches.
@@ -508,6 +579,15 @@
       <button class:active-btn={currentTab === 'final'} onclick={() => currentTab = 'final'}>[ {tabLabels.final} ]</button>
     </div>
     <div class="nav-row">
+      <button class="nav-util-btn" onclick={exportData}>[ {t.ui.export} ]</button>
+      <label class="nav-util-btn" style="cursor: pointer;">
+        [ {t.ui.import} ]
+        <input type="file" accept=".json" onchange={handleImport} style="display: none;" />
+      </label>
+      <button class="nav-util-btn" onclick={syncOfficialResults}>[ {t.ui.sync} ]</button>
+      {#if currentTab === 'matches'}
+        <button class="nav-util-btn" onclick={simulateGroupStage}>[ {t.ui.simulate_all} ]</button>
+      {/if}
       <button class="reset-btn-nav" onclick={resetData}>
         [ {t.ui.reset} ]
       </button>

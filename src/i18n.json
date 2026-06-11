@@ -11,7 +11,7 @@
       "standings": "STANDINGS"
     },
     "status": { "penalties": "[ PENALTY SHOOTOUT ]", "pks": "PKS" },
-    "ui": { "tbd": "TBD", "reset": "RESET", "match_label": "MATCH", "tracker": "TRACKER", "ready": "P1 READY", "reset_confirm": "Reset tournament?", "select_venue": "SELECT VENUE:", "all_dates": "ALL DATES", "all_venues": "ALL VENUES", "all_groups": "ALL GROUPS", "all_teams": "ALL TEAMS", "filter_by": "FILTER BY DATE:", "filter_group": "FILTER BY GROUP:", "filter_team": "FILTER BY TEAM:", "machine_error": "MACHINE ERROR", "system_malfunction": "SYSTEM MALFUNCTION", "contact_operator": "CONTACT OPERATOR" },
+    "ui": { "tbd": "TBD", "reset": "RESET", "match_label": "MATCH", "tracker": "TRACKER", "ready": "P1 READY", "reset_confirm": "Reset tournament?", "select_venue": "SELECT VENUE:", "all_dates": "ALL DATES", "all_venues": "ALL VENUES", "all_groups": "ALL GROUPS", "all_teams": "ALL TEAMS", "filter_by": "FILTER BY DATE:", "filter_group": "FILTER BY GROUP:", "filter_team": "FILTER BY TEAM:", "machine_error": "MACHINE ERROR", "system_malfunction": "SYSTEM MALFUNCTION", "contact_operator": "CONTACT OPERATOR", "export": "EXPORT", "import": "IMPORT", "simulate_all": "AUTO-FILL", "simulate_confirm": "Auto-fill Group Stage with random scores?", "sync": "SYNC", "sync_confirm": "Sync with official results? This will overwrite your scores for those matches.", "sync_success": "SYNC COMPLETE" },
     "standings": {
       "pos": "POS",
       "team": "TEAM",
@@ -92,7 +92,7 @@
       "standings": "CLASSIFICAÇÃO"
     },
     "status": { "penalties": "[ DISPUTA DE PÊNALTIS ]", "pks": "PEN" },
-    "ui": { "tbd": "A DEFINIR", "reset": "REINICIAR", "match_label": "JOGO", "tracker": "SIMULADOR", "ready": "P1 PRONTO", "reset_confirm": "Reiniciar torneio?", "select_venue": "ESCOLHA A SEDE:", "all_dates": "TODAS AS DATAS", "all_venues": "TODAS AS SEDES", "all_groups": "TODOS OS GRUPOS", "all_teams": "TODAS AS SELEÇÕES", "filter_by": "FILTRAR POR DATA:", "filter_group": "FILTRAR POR GRUPO:", "filter_team": "FILTRAR POR SELEÇÃO:", "machine_error": "ERRO NA MÁQUINA", "system_malfunction": "FALHA NO SISTEMA", "contact_operator": "CONTATE O OPERADOR" },
+    "ui": { "tbd": "A DEFINIR", "reset": "REINICIAR", "match_label": "JOGO", "tracker": "SIMULADOR", "ready": "P1 PRONTO", "reset_confirm": "Reiniciar torneio?", "select_venue": "ESCOLHA A SEDE:", "all_dates": "TODAS AS DATAS", "all_venues": "TODAS AS SEDES", "all_groups": "TODOS OS GRUPOS", "all_teams": "TODAS AS SELEÇÕES", "filter_by": "FILTRAR POR DATA:", "filter_group": "FILTRAR POR GRUPO:", "filter_team": "FILTRAR POR SELEÇÃO:", "machine_error": "ERRO NA MÁQUINA", "system_malfunction": "FALHA NO SISTEMA", "contact_operator": "CONTATE O OPERADOR", "export": "EXPORTAR", "import": "IMPORTAR", "simulate_all": "AUTO-PREENCHER", "simulate_confirm": "Auto-preencher Fase de Grupos com placares aleatórios?", "sync": "SINCRONIZAR", "sync_confirm": "Sincronizar com resultados oficiais? Isso substituirá seus placares para esses jogos.", "sync_success": "SINCRONIZAÇÃO CONCLUÍDA" },
     "standings": {
       "pos": "POS",
       "team": "SELEÇÃO",
