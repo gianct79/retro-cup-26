@@ -26,7 +26,7 @@
   let selectedDate = $state('all'); // 'all' for 'all dates'
   let selectedGroup = $state(null); // null for 'all groups'
   let selectedTeam = $state(null); // null for 'all teams'
-  let locale = $state('en'); // 'en' or 'pt'
+  let locale = $state(localStorage.getItem(STORAGE_KEY + '_locale') || 'en'); // Persisted 'en' or 'pt'
 
   // --- UTILS ---
   const t = $derived(i18n[locale]);
@@ -98,6 +98,10 @@
   // --- AUTOSAVE ---
   $effect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(matches));
+  });
+
+  $effect(() => {
+    localStorage.setItem(STORAGE_KEY + '_locale', locale);
   });
 
   // Reset date filter when changing tabs to prevent empty views
