@@ -10,20 +10,55 @@
   // --- STATE (RUNES) ---
   const STORAGE_KEY = 'retro_cup_26';
 
+  // Helper to get a fresh set of all match templates
+  function getAllInitialMatchesTemplates() {
+    return [
+      ...structuredClone(initialData.matches.group_stage),
+      ...structuredClone(initialData.matches.r32),
+      ...structuredClone(initialData.matches.r16),
+      ...structuredClone(initialData.matches.qf),
+      ...structuredClone(initialData.matches.sf),
+      ...structuredClone(initialData.matches.third),
+      ...structuredClone(initialData.matches.final)
+    ].sort((a, b) => a.id - b.id); // Ensure consistent order
+  }
+
   function initMatches() {
+    const baseMatches = getAllInitialMatchesTemplates();
+    const matchesMap = new Map(baseMatches.map(m => [m.id, m]));
+
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
-      const parsed = JSON.parse(saved);
-      return Array.isArray(parsed) ? parsed : structuredClone(initialData.matches.group_stage);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          parsed.forEach(savedMatch => {
+            const baseMatch = matchesMap.get(savedMatch.id);
+            if (baseMatch) {
+              // Only update the user-editable properties
+              baseMatch.played = savedMatch.played ?? false;
+              baseMatch.team1.score = savedMatch.team1?.score ?? 0;
+              baseMatch.team1.yellow_cards = savedMatch.team1?.yellow_cards ?? 0;
+              baseMatch.team1.red_cards = savedMatch.team1?.red_cards ?? 0;
+              baseMatch.team1.penalties = savedMatch.team1?.penalties ?? 0;
+              baseMatch.team2.score = savedMatch.team2?.score ?? 0;
+              baseMatch.team2.yellow_cards = savedMatch.team2?.yellow_cards ?? 0;
+              baseMatch.team2.red_cards = savedMatch.team2?.red_cards ?? 0;
+              baseMatch.team2.penalties = savedMatch.team2?.penalties ?? 0;
+            }
+          });
+        }
+      }
     } catch (e) {
-      return structuredClone(initialData.matches.group_stage);
+      console.error("Error loading matches from localStorage:", e);
     }
+    return baseMatches;
   }
 
   let matches = $state(initMatches());
   let currentTab = $state('matches'); // matches, r32, r16, qf, sf, third, final, standings
   let selectedVenue = $state(null); // null for 'all venues'
-  let selectedDate = $state('all'); // 'all' for 'all dates'
+  let selectedDate = $state(null); // null for 'all dates'
   let selectedGroup = $state(null); // null for 'all groups'
   let selectedTeam = $state(null); // null for 'all teams'
   let locale = $state(localStorage.getItem(STORAGE_KEY + '_locale') || 'en'); // Persisted 'en' or 'pt'
@@ -34,6 +69,15 @@
   const teamCodes = Object.keys(initialData.teams); // Consistent order for sprite lookup
   const langTag = $derived(locale === 'en' ? 'en-US' : 'pt-BR');
 
+  const getLocalDateStr = (dateStr) => {
+    if (!dateStr || dateStr === 'TBD') return 'TBD';
+    const d = new Date(dateStr);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const formatDate = (dateStr) => {
     if (!dateStr) return 'TBD';
     return new Date(dateStr).toLocaleString(langTag, {
@@ -42,7 +86,7 @@
   };
 
   const formatShortDate = (dateStr) => {
-    if (dateStr === 'all') return t.ui.all_dates;
+    if (dateStr === null) return t.ui.all_dates;
     const [y, m, d] = dateStr.split('-').map(Number);
     const date = new Date(y, m - 1, d); // Parse as local time to avoid TZ shifts
     return date.toLocaleDateString(langTag, {
@@ -97,7 +141,18 @@
 
   // --- AUTOSAVE ---
   $effect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(matches));
+    // Save only the user-modified data (scores, cards, penalties, played status)
+    const dataToSave = matches.map(match => ({
+      id: match.id,
+      played: match.played,
+      team1: {
+        score: match.team1.score, yellow_cards: match.team1.yellow_cards, red_cards: match.team1.red_cards, penalties: match.team1.penalties
+      },
+      team2: {
+        score: match.team2.score, yellow_cards: match.team2.yellow_cards, red_cards: match.team2.red_cards, penalties: match.team2.penalties
+      }
+    }));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
   });
 
   $effect(() => {
@@ -107,7 +162,7 @@
   // Reset date filter when changing tabs to prevent empty views
   $effect(() => {
     currentTab;
-    selectedDate = 'all';
+    selectedDate = null;
     selectedVenue = null;
     selectedGroup = null;
     selectedTeam = null;
@@ -116,7 +171,7 @@
   // --- LOGIC ---
   function resetData() {
     if (confirm(t.ui.reset_confirm)) {
-      matches = structuredClone(initialData.matches.group_stage);
+      matches = getAllInitialMatchesTemplates();
       localStorage.removeItem(STORAGE_KEY);
     }
   }
@@ -126,22 +181,7 @@
    * Handles both group stage and dynamic knockout matches.
    */
    function updateMatchData(matchId, teamKey, statKey, delta) {
-    let match = matches.find(m => m.id === matchId);
-    
-    if (!match && matchId > 72) {
-      // Initialize knockout match from template if it doesn't exist in state yet
-      const categories = ['r32', 'r16', 'qf', 'sf', 'third', 'final'];
-      let template;
-      for (const cat of categories) {
-        template = initialData.matches[cat].find(m => m.id === matchId);
-        if (template) break;
-      }
-      
-      if (template) {
-        match = structuredClone(template);
-        matches.push(match);
-      }
-    }
+    const match = matches.find(m => m.id === matchId); // All matches are already in the array
 
     if (match) {
       const currentVal = Number(match[teamKey][statKey] || 0);
@@ -198,7 +238,7 @@
 
   // Get the pool of matches for the currently active tab
   let activeMatchesPool = $derived.by(() => {
-    if (currentTab === 'matches') return matches.filter(m => m.id <= 72);
+    if (currentTab === 'matches') return matches.filter(m => m.id <= 72); // Group stage matches
     if (currentTab === 'r32') return r32Matches;
     if (currentTab === 'r16') return r16Matches;
     if (currentTab === 'qf') return qfMatches;
@@ -210,7 +250,7 @@
 
   // Extract unique venues from the current pool
   let activeVenues = $derived.by(() => {
-    const venues = [...new Set(activeMatchesPool
+    const venues = [...new Set(activeMatchesPool // Use activeMatchesPool for relevant filters
       .map(m => m.venue))]
       .filter(v => v && v !== 'TBD')
       .sort();
@@ -219,11 +259,11 @@
 
   // Extract unique dates from the current pool
   let activeDates = $derived.by(() => {
-    const dates = [...new Set(activeMatchesPool
-      .map(m => m.date?.split('T')[0]))]
+    const dates = [...new Set(activeMatchesPool // Use activeMatchesPool for relevant filters
+      .map(m => getLocalDateStr(m.date)))]
       .filter(d => d && d !== 'TBD')
       .sort();
-    return ['all', ...dates];
+    return [null, ...dates];
   });
 
   // Extract unique groups for filtering
@@ -248,9 +288,9 @@
   });
   // Count matches per date in the current pool
   let activeMatchCounts = $derived.by(() => {
-    const counts = { all: activeMatchesPool.length };
+    const counts = { [null]: activeMatchesPool.length };
     activeMatchesPool.forEach(m => {
-      const d = m.date?.split('T')[0];
+      const d = getLocalDateStr(m.date);
       if (d && d !== 'TBD') counts[d] = (counts[d] || 0) + 1;
     });
     return counts;
@@ -440,24 +480,19 @@
     });
   });
 
-  // --- VENUE SEARCH LOGIC ---
-  let allTournamentMatches = $derived([
-    ...matches.filter(m => m.id <= 72),
-    ...r32Matches, ...r16Matches, ...qfMatches, ...sfMatches, ...thirdMatch, ...finalMatch
-  ]);
 </script>
 
 {#snippet globalFiltersUI()}
   <div class="arcade-filters">
     <FilterSelect 
       label={t.ui.filter_by} 
-      options={activeDates.map(d => ({ id: d, label: formatShortDate(d) + (d !== 'all' ? ` [${activeMatchCounts[d]}]` : '') }))} 
+      options={activeDates.map(d => ({ id: d, label: formatShortDate(d) + (d !== null ? ` [${activeMatchCounts[d]}]` : '') }))} 
       bind:value={selectedDate} 
       placeholder={t.ui.all_dates} 
     />
     <FilterSelect 
       label={t.ui.select_venue} 
-      options={activeVenues.filter(v => v !== null).map(v => ({ id: v, label: initialData.venues[v] || v }))} 
+      options={activeVenues.map(v => ({ id: v, label: v ? (initialData.venues[v] || v) : t.ui.all_venues }))} 
       bind:value={selectedVenue} 
       placeholder={t.ui.all_venues} 
     />
@@ -529,7 +564,7 @@
         {@render globalFiltersUI()}
 
         {#each activeMatchesPool.filter(m => 
-          (selectedDate === 'all' || m.date?.startsWith(selectedDate)) && 
+          (!selectedDate || getLocalDateStr(m.date) === selectedDate) && 
           (!selectedVenue || m.venue === selectedVenue) &&
           (!selectedGroup || initialData.teams[m.team1.code]?.group === selectedGroup) &&
           (!selectedTeam || m.team1.code === selectedTeam || m.team2.code === selectedTeam)
