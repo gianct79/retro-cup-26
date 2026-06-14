@@ -1,6 +1,7 @@
 <script>
   import initialData from './data.json';
   import thirdPlaceData from './3rd_place_data.json';
+  import officialData from './data_official.json';
   import i18n from './i18n.json';
   import './styles/app.css'; // Ensure this is imported before any component-specific styles if they override global ones
   import FilterSelect from './components/FilterSelect.svelte';
@@ -23,31 +24,35 @@
     ].sort((a, b) => a.id - b.id); // Ensure consistent order
   }
 
-  function initMatches() {
+  function loadMatches(mode) {
     const baseMatches = getAllInitialMatchesTemplates();
     const matchesMap = new Map(baseMatches.map(m => [m.id, m]));
 
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) {
-          parsed.forEach(savedMatch => {
-            const baseMatch = matchesMap.get(savedMatch.id);
-            if (baseMatch) {
-              // Only update the user-editable properties
-              baseMatch.played = savedMatch.played ?? false;
-              baseMatch.team1.score = savedMatch.team1?.score ?? 0;
-              baseMatch.team1.yellow_cards = savedMatch.team1?.yellow_cards ?? 0;
-              baseMatch.team1.red_cards = savedMatch.team1?.red_cards ?? 0;
-              baseMatch.team1.penalties = savedMatch.team1?.penalties ?? 0;
-              baseMatch.team2.score = savedMatch.team2?.score ?? 0;
-              baseMatch.team2.yellow_cards = savedMatch.team2?.yellow_cards ?? 0;
-              baseMatch.team2.red_cards = savedMatch.team2?.red_cards ?? 0;
-              baseMatch.team2.penalties = savedMatch.team2?.penalties ?? 0;
-            }
-          });
-        }
+      let parsed = null;
+      if (mode === 'simulation') {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved)
+          parsed = JSON.parse(saved);
+      } else {
+        parsed = officialData;
+      }
+      if (Array.isArray(parsed)) {
+        parsed.forEach(savedMatch => {
+          const baseMatch = matchesMap.get(savedMatch.id);
+          if (baseMatch) {
+            // Only update the user-editable properties
+            baseMatch.played = savedMatch.played ?? false;
+            baseMatch.team1.score = savedMatch.team1?.score ?? 0;
+            baseMatch.team1.yellow_cards = savedMatch.team1?.yellow_cards ?? 0;
+            baseMatch.team1.red_cards = savedMatch.team1?.red_cards ?? 0;
+            baseMatch.team1.penalties = savedMatch.team1?.penalties ?? 0;
+            baseMatch.team2.score = savedMatch.team2?.score ?? 0;
+            baseMatch.team2.yellow_cards = savedMatch.team2?.yellow_cards ?? 0;
+            baseMatch.team2.red_cards = savedMatch.team2?.red_cards ?? 0;
+            baseMatch.team2.penalties = savedMatch.team2?.penalties ?? 0;
+          }
+        });
       }
     } catch (e) {
       console.error("Error loading matches from localStorage:", e);
@@ -55,7 +60,8 @@
     return baseMatches;
   }
 
-  let matches = $state(initMatches());
+  let appMode = $state('simulation'); // simulation, official
+  let matches = $state(loadMatches('simulation'));
   let currentTab = $state('matches'); // matches, r32, r16, qf, sf, third, final, standings
   let selectedVenue = $state(null); // null for 'all venues'
   let selectedDate = $state(null); // null for 'all dates'
@@ -141,6 +147,9 @@
 
   // --- AUTOSAVE ---
   $effect(() => {
+    if (appMode !== 'simulation')
+      return;
+
     // Save only the user-modified data (scores, cards, penalties, played status)
     const dataToSave = matches.map(match => ({
       id: match.id,
@@ -157,6 +166,11 @@
 
   $effect(() => {
     localStorage.setItem(STORAGE_KEY + '_locale', locale);
+  });
+
+  // Re-load matches when switching modes
+  $effect(() => {
+    matches = loadMatches(appMode);
   });
 
   // Reset date filter when changing tabs to prevent empty views
@@ -181,6 +195,8 @@
    * Handles both group stage and dynamic knockout matches.
    */
    function updateMatchData(matchId, teamKey, statKey, delta) {
+    if (appMode === 'official')
+      return;
     const match = matches.find(m => m.id === matchId); // All matches are already in the array
 
     if (match) {
@@ -521,6 +537,10 @@
       <button class:active-lang={locale === 'en'} onclick={() => locale = 'en'}>EN</button>
       <button class:active-lang={locale === 'pt'} onclick={() => locale = 'pt'}>PT</button>
     </div>
+    <div class="lang-switcher mode-switcher">
+      <button class:active-lang={appMode === 'simulation'} onclick={() => appMode = 'simulation'}>{t.ui.mode_simulation}</button>
+      <button class:active-lang={appMode === 'official'} onclick={() => appMode = 'official'}>{t.ui.mode_official}</button>
+    </div>
   </header>
 
   <nav class="arcade-nav">
@@ -543,9 +563,11 @@
       <button class:active-btn={currentTab === 'final'} onclick={() => currentTab = 'final'}>[ {tabLabels.final} ]</button>
     </div>
     <div class="nav-row">
-      <button class="reset-btn-nav" onclick={resetData}>
-        [ {t.ui.reset} ]
-      </button>
+      {#if appMode === 'simulation'}
+        <button class="reset-btn-nav" onclick={resetData}>
+          [ {t.ui.reset} ]
+        </button>
+      {/if}
     </div>
   </nav>
 
@@ -575,6 +597,7 @@
             {teamCodes} 
             venues={initialData.venues} 
             onUpdate={updateMatchData} 
+            isReadOnly={appMode === 'official'}
             {formatDate} 
           />
         {/each}

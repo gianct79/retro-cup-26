@@ -1,9 +1,10 @@
 <script>
   import PixelFlag from './PixelFlag.svelte';
   
-  let { match, t, teamCodes, venues, onUpdate, formatDate } = $props();
+  let { match, t, teamCodes, venues, onUpdate, formatDate, isReadOnly = false } = $props();
 
   function handleStat(teamKey, statKey, delta) {
+    if (isReadOnly) return;
     onUpdate(match.id, teamKey, statKey, delta);
   }
 </script>
@@ -26,25 +27,25 @@
 
       {#if match.team1.code !== 'TBD'}
         <div class="stat-control">
-          <button type="button" class="stat-btn" onclick={() => handleStat('team1', 'score', -1)}>-</button>
+          <button type="button" class="stat-btn" onclick={() => handleStat('team1', 'score', -1)} disabled={isReadOnly}>-</button>
           <span class="stat-display">{match.team1.score}</span>
-          <button type="button" class="stat-btn" onclick={() => handleStat('team1', 'score', 1)}>+</button>
+          <button type="button" class="stat-btn" onclick={() => handleStat('team1', 'score', 1)} disabled={isReadOnly}>+</button>
         </div>
         <div class="match-cards-ui">
           <div class="card-control-item">
             <div class="pixel-card-icon yellow-card"></div>
             <div class="arcade-counter">
-              <button type="button" class="stat-btn" onclick={() => handleStat('team1', 'yellow_cards', -1)}>-</button>
+              <button type="button" class="stat-btn" onclick={() => handleStat('team1', 'yellow_cards', -1)} disabled={isReadOnly}>-</button>
               <span class="stat-count">{match.team1.yellow_cards || 0}</span>
-              <button type="button" class="stat-btn" onclick={() => handleStat('team1', 'yellow_cards', 1)}>+</button>
+              <button type="button" class="stat-btn" onclick={() => handleStat('team1', 'yellow_cards', 1)} disabled={isReadOnly}>+</button>
             </div>
           </div>
           <div class="card-control-item">
             <div class="pixel-card-icon red-card"></div>
             <div class="arcade-counter">
-              <button type="button" class="stat-btn" onclick={() => handleStat('team1', 'red_cards', -1)}>-</button>
+              <button type="button" class="stat-btn" onclick={() => handleStat('team1', 'red_cards', -1)} disabled={isReadOnly}>-</button>
               <span class="stat-count">{match.team1.red_cards || 0}</span>
-              <button type="button" class="stat-btn" onclick={() => handleStat('team1', 'red_cards', 1)}>+</button>
+              <button type="button" class="stat-btn" onclick={() => handleStat('team1', 'red_cards', 1)} disabled={isReadOnly}>+</button>
             </div>
           </div>
         </div>
@@ -65,25 +66,25 @@
 
       {#if match.team2.code !== 'TBD'}
         <div class="stat-control">
-          <button type="button" class="stat-btn" onclick={() => handleStat('team2', 'score', -1)}>-</button>
+          <button type="button" class="stat-btn" onclick={() => handleStat('team2', 'score', -1)} disabled={isReadOnly}>-</button>
           <span class="stat-display">{match.team2.score}</span>
-          <button type="button" class="stat-btn" onclick={() => handleStat('team2', 'score', 1)}>+</button>
+          <button type="button" class="stat-btn" onclick={() => handleStat('team2', 'score', 1)} disabled={isReadOnly}>+</button>
         </div>
         <div class="match-cards-ui">
           <div class="card-control-item">
             <div class="pixel-card-icon yellow-card"></div>
             <div class="arcade-counter">
-              <button type="button" class="stat-btn" onclick={() => handleStat('team2', 'yellow_cards', -1)}>-</button>
+              <button type="button" class="stat-btn" onclick={() => handleStat('team2', 'yellow_cards', -1)} disabled={isReadOnly}>-</button>
               <span class="stat-count">{match.team2.yellow_cards || 0}</span>
-              <button type="button" class="stat-btn" onclick={() => handleStat('team2', 'yellow_cards', 1)}>+</button>
+              <button type="button" class="stat-btn" onclick={() => handleStat('team2', 'yellow_cards', 1)} disabled={isReadOnly}>+</button>
             </div>
           </div>
           <div class="card-control-item">
             <div class="pixel-card-icon red-card"></div>
             <div class="arcade-counter">
-              <button type="button" class="stat-btn" onclick={() => handleStat('team2', 'red_cards', -1)}>-</button>
+              <button type="button" class="stat-btn" onclick={() => handleStat('team2', 'red_cards', -1)} disabled={isReadOnly}>-</button>
               <span class="stat-count">{match.team2.red_cards || 0}</span>
-              <button type="button" class="stat-btn" onclick={() => handleStat('team2', 'red_cards', 1)}>+</button>
+              <button type="button" class="stat-btn" onclick={() => handleStat('team2', 'red_cards', 1)} disabled={isReadOnly}>+</button>
             </div>
           </div>
         </div>
@@ -96,15 +97,15 @@
       <p class="penalty-title">{t.status.penalties}</p>
       <div class="penalty-controls">
         <div class="stat-control">
-          <button type="button" class="stat-btn" onclick={() => handleStat('team1', 'penalties', -1)}>-</button>
+          <button type="button" class="stat-btn" onclick={() => handleStat('team1', 'penalties', -1)} disabled={isReadOnly}>-</button>
           <span class="stat-display">{match.team1.penalties || 0}</span>
-          <button type="button" class="stat-btn" onclick={() => handleStat('team1', 'penalties', 1)}>+</button>
+          <button type="button" class="stat-btn" onclick={() => handleStat('team1', 'penalties', 1)} disabled={isReadOnly}>+</button>
         </div>
         <span class="vs-pks">{t.status.pks}</span>
         <div class="stat-control">
-          <button type="button" class="stat-btn" onclick={() => handleStat('team2', 'penalties', -1)}>-</button>
+          <button type="button" class="stat-btn" onclick={() => handleStat('team2', 'penalties', -1)} disabled={isReadOnly}>-</button>
           <span class="stat-display">{match.team2.penalties || 0}</span>
-          <button type="button" class="stat-btn" onclick={() => handleStat('team2', 'penalties', 1)}>+</button>
+          <button type="button" class="stat-btn" onclick={() => handleStat('team2', 'penalties', 1)} disabled={isReadOnly}>+</button>
         </div>
       </div>
     </div>
