@@ -1,4 +1,5 @@
 <script>
+  import { untrack } from 'svelte';
   import initialData from './data.json';
   import thirdPlaceData from './3rd_place_data.json';
   import officialData from './data_official.json';
@@ -147,11 +148,14 @@
 
   // --- AUTOSAVE ---
   $effect(() => {
-    if (appMode !== 'simulation')
+    // Trigger this effect when 'matches' actually changes.
+    // Untrack 'appMode' to prevent the effect from firing immediately during a mode switch.
+    const currentMatches = matches;
+    if (untrack(() => appMode) !== 'simulation')
       return;
 
     // Save only the user-modified data (scores, cards, penalties, played status)
-    const dataToSave = matches.map(match => ({
+    const dataToSave = currentMatches.map(match => ({
       id: match.id,
       played: match.played,
       team1: {

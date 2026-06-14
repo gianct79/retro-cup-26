@@ -1,1 +1,11 @@
-[]
+[
+  {"id":1,"played":true,"team1":{"score":2,"yellow_cards":1,"red_cards":1,"penalties":0},"team2":{"score":0,"yellow_cards":2,"red_cards":2,"penalties":0}},
+  {"id":2,"played":true,"team1":{"score":2,"yellow_cards":1,"red_cards":0,"penalties":0},"team2":{"score":1,"yellow_cards":0,"red_cards":0,"penalties":0}},
+  {"id":3,"played":true,"team1":{"score":1,"yellow_cards":2,"red_cards":0,"penalties":0},"team2":{"score":1,"yellow_cards":3,"red_cards":0,"penalties":0}},
+  {"id":4,"played":true,"team1":{"score":4,"yellow_cards":1,"red_cards":0,"penalties":0},"team2":{"score":1,"yellow_cards":5,"red_cards":0,"penalties":0}},
+  {"id":5,"played":true,"team1":{"score":1,"yellow_cards":2,"red_cards":0,"penalties":0},"team2":{"score":1,"yellow_cards":1,"red_cards":0,"penalties":0}},
+  {"id":6,"played":true,"team1":{"score":1,"yellow_cards":2,"red_cards":0,"penalties":0},"team2":{"score":1,"yellow_cards":0,"red_cards":0,"penalties":0}},
+  {"id":7,"played":true,"team1":{"score":0,"yellow_cards":1,"red_cards":0,"penalties":0},"team2":{"score":1,"yellow_cards":3,"red_cards":0,"penalties":0}},
+  {"id":8,"played":true,"team1":{"score":2,"yellow_cards":0,"red_cards":0,"penalties":0},"team2":{"score":0,"yellow_cards":1,"red_cards":0,"penalties":0}},
+  {"id":9,"played":true,"team1":{"score":7,"yellow_cards":0,"red_cards":0,"penalties":0},"team2":{"score":1,"yellow_cards":0,"red_cards":0,"penalties":0}}
+]
