@@ -395,12 +395,35 @@
     return { slots: top2, hasError };
   });
 
+  /**
+   * Reorders knockout matches for the Bracket view.
+   * This ensures that matches that feed into each other are positioned correctly
+   * in the visualization (e.g., Match 89 sits next to 74 and 77).
+   */
   let knockoutRounds = $derived([
-    { label: tabLabels.r32, matches: r32Matches },
-    { label: tabLabels.r16, matches: r16Matches },
-    { label: tabLabels.qf, matches: qfMatches },
-    { label: tabLabels.sf, matches: sfMatches },
-    { label: `${tabLabels.final} & ${tabLabels.third}`, matches: [...finalMatch, ...thirdMatch] }
+    { 
+      label: tabLabels.r32, 
+      matches: [74, 77, 73, 75, 83, 84, 81, 82, 76, 78, 79, 80, 86, 88, 85, 87]
+        .map(id => r32Matches.find(m => m.id === id)) 
+    },
+    { 
+      label: tabLabels.r16, 
+      matches: [89, 90, 93, 94, 91, 92, 95, 96]
+        .map(id => r16Matches.find(m => m.id === id)) 
+    },
+    { 
+      label: tabLabels.qf, 
+      matches: [97, 98, 99, 100]
+        .map(id => qfMatches.find(m => m.id === id)) 
+    },
+    { 
+      label: tabLabels.sf, 
+      matches: [101, 102].map(id => sfMatches.find(m => m.id === id)) 
+    },
+    { 
+      label: `${tabLabels.final} & ${tabLabels.third}`, 
+      matches: [...finalMatch, ...thirdMatch] 
+    }
   ]);
 
   let qualifiers = $derived(qualifiersData.slots);
