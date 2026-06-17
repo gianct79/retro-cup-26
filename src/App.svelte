@@ -8,6 +8,7 @@
   import FilterSelect from './components/FilterSelect.svelte';
   import MatchCard from './components/MatchCard.svelte';
   import StandingsTable from './components/StandingsTable.svelte';
+  import Bracket from './components/Bracket.svelte';
 
   // --- STATE (RUNES) ---
   const STORAGE_KEY = 'retro_cup_26';
@@ -42,16 +43,14 @@
         parsed.forEach(savedMatch => {
           const baseMatch = matchesMap.get(savedMatch.id);
           if (baseMatch) {
-            // Only update the user-editable properties
-            baseMatch.played = savedMatch.played ?? false;
-            baseMatch.team1.score = savedMatch.team1?.score ?? 0;
-            baseMatch.team1.yellow_cards = savedMatch.team1?.yellow_cards ?? 0;
-            baseMatch.team1.red_cards = savedMatch.team1?.red_cards ?? 0;
-            baseMatch.team1.penalties = savedMatch.team1?.penalties ?? 0;
-            baseMatch.team2.score = savedMatch.team2?.score ?? 0;
-            baseMatch.team2.yellow_cards = savedMatch.team2?.yellow_cards ?? 0;
-            baseMatch.team2.red_cards = savedMatch.team2?.red_cards ?? 0;
-            baseMatch.team2.penalties = savedMatch.team2?.penalties ?? 0;
+            baseMatch.played = !!savedMatch.played;
+            ['team1', 'team2'].forEach(tKey => {
+              if (savedMatch[tKey]) {
+                ['score', 'yellow_cards', 'red_cards', 'penalties'].forEach(sKey => {
+                  baseMatch[tKey][sKey] = savedMatch[tKey][sKey] ?? 0;
+                });
+              }
+            });
           }
         });
       }
@@ -63,7 +62,7 @@
 
   let appMode = $state('simulation'); // simulation, official
   let matches = $state(loadMatches('simulation'));
-  let currentTab = $state('matches'); // matches, r32, r16, qf, sf, third, final, standings
+  let currentTab = $state('matches'); // matches, bracket, standings, etc
   let selectedVenue = $state(null); // null for 'all venues'
   let selectedDate = $state(null); // null for 'all dates'
   let selectedGroup = $state(null); // null for 'all groups'
@@ -316,6 +315,16 @@
     return counts;
   });
 
+  // Final filtered list for the UI
+  let filteredMatches = $derived.by(() => {
+    return activeMatchesPool.filter(m => 
+      (!selectedDate || getLocalDateStr(m.date) === selectedDate) && 
+      (!selectedVenue || m.venue === selectedVenue) &&
+      (!selectedGroup || initialData.teams[m.team1.code]?.group === selectedGroup) &&
+      (!selectedTeam || m.team1.code === selectedTeam || m.team2.code === selectedTeam)
+    );
+  });
+
   let groupsWithStandings = $derived.by(() => {
     const result = {};
     Object.keys(initialData.groups).forEach(name => {
@@ -385,6 +394,14 @@
 
     return { slots: top2, hasError };
   });
+
+  let knockoutRounds = $derived([
+    { label: tabLabels.r32, matches: r32Matches },
+    { label: tabLabels.r16, matches: r16Matches },
+    { label: tabLabels.qf, matches: qfMatches },
+    { label: tabLabels.sf, matches: sfMatches },
+    { label: `${tabLabels.final} & ${tabLabels.third}`, matches: [...finalMatch, ...thirdMatch] }
+  ]);
 
   let qualifiers = $derived(qualifiersData.slots);
   let isAllocationError = $derived(qualifiersData.hasError);
@@ -555,6 +572,9 @@
       <button class:active-btn={currentTab === 'standings'} onclick={() => currentTab = 'standings'}>
         [ {tabLabels.standings} ]
       </button>
+      <button class:active-btn={currentTab === 'bracket'} onclick={() => currentTab = 'bracket'}>
+        [ {tabLabels.bracket} ]
+      </button>
     </div>
     <div class="nav-row">
       <button class:active-btn={currentTab === 'r32'} onclick={() => currentTab = 'r32'}>[ {tabLabels.r32} ]</button>
@@ -589,12 +609,7 @@
         <h2 class="section-title">[ {tabLabels[currentTab]} ]</h2>
         {@render globalFiltersUI()}
 
-        {#each activeMatchesPool.filter(m => 
-          (!selectedDate || getLocalDateStr(m.date) === selectedDate) && 
-          (!selectedVenue || m.venue === selectedVenue) &&
-          (!selectedGroup || initialData.teams[m.team1.code]?.group === selectedGroup) &&
-          (!selectedTeam || m.team1.code === selectedTeam || m.team2.code === selectedTeam)
-        ) as match (match.id)}
+        {#each filteredMatches as match (match.id)}
           <MatchCard 
             {match} 
             {t} 
@@ -605,6 +620,15 @@
             {formatDate} 
           />
         {/each}
+      </div>
+    {:else if currentTab === 'bracket'}
+      <div class="matches-container">
+        <h2 class="section-title">[ {tabLabels.bracket} ]</h2>
+        <Bracket 
+          rounds={knockoutRounds} 
+          {t} 
+          {teamCodes} 
+        />
       </div>
     {:else}
       <div class="standings-container">
