@@ -8,10 +8,11 @@
       "sf": "SEMI-FINALS",
       "third": "THIRD-PLACE",
       "final": "FINAL",
-      "standings": "STANDINGS"
+      "standings": "STANDINGS",
+      "bracket": "BRACKET"
     },
     "status": { "penalties": "[ PENALTY SHOOTOUT ]", "pks": "PKS" },
-    "ui": { "tbd": "TBD", "reset": "RESET", "match_label": "MATCH", "tracker": "SIMULATOR", "ready": "P1 READY", "reset_confirm": "Reset tournament?", "select_venue": "SELECT VENUE:", "all_dates": "ALL DATES", "all_venues": "ALL VENUES", "all_groups": "ALL GROUPS", "all_teams": "ALL TEAMS", "filter_by": "FILTER BY DATE:", "filter_group": "FILTER BY GROUP:", "filter_team": "FILTER BY TEAM:", "machine_error": "MACHINE ERROR", "system_malfunction": "SYSTEM MALFUNCTION", "contact_operator": "CONTACT OPERATOR", "mode_official": "OFFICIAL", "mode_simulation": "SIMULATOR" },
+    "ui": { "tbd": "TBD", "reset": "RESET", "match_label": "MATCH", "tracker": "SIMULATOR", "ready": "P1 READY", "reset_confirm": "Reset tournament?", "select_venue": "SELECT VENUE:", "all_dates": "ALL DATES", "all_venues": "ALL VENUES", "all_groups": "ALL GROUPS", "all_teams": "ALL TEAMS", "filter_by": "FILTER BY DATE:", "filter_group": "FILTER BY GROUP:", "filter_team": "FILTER BY TEAM:", "machine_error": "MACHINE ERROR", "system_malfunction": "SYSTEM MALFUNCTION", "contact_operator": "CONTACT OPERATOR", "mode_official": "OFFICIAL", "mode_simulation": "SIMULATOR", "swipe_to_view": "SWIPE TO NAVIGATE" },
     "standings": {
       "pos": "POS",
       "team": "TEAM",
@@ -89,10 +90,11 @@
       "sf": "SEMIFINAL",
       "third": "TERCEIRO LUGAR",
       "final": "FINAL",
-      "standings": "CLASSIFICAÇÃO"
+      "standings": "CLASSIFICAÇÃO",
+      "bracket": "CHAVEAMENTO"
     },
     "status": { "penalties": "[ DISPUTA DE PÊNALTIS ]", "pks": "PEN" },
-    "ui": { "tbd": "A DEFINIR", "reset": "REINICIAR", "match_label": "JOGO", "tracker": "SIMULADOR", "ready": "P1 PRONTO", "reset_confirm": "Reiniciar torneio?", "select_venue": "ESCOLHA A SEDE:", "all_dates": "TODAS AS DATAS", "all_venues": "TODAS AS SEDES", "all_groups": "TODOS OS GRUPOS", "all_teams": "TODAS AS SELEÇÕES", "filter_by": "FILTRAR POR DATA:", "filter_group": "FILTRAR POR GRUPO:", "filter_team": "FILTRAR POR SELEÇÃO:", "machine_error": "ERRO NA MÁQUINA", "system_malfunction": "FALHA NO SISTEMA", "contact_operator": "CONTATE O OPERADOR", "mode_official": "OFICIAL", "mode_simulation": "SIMULADOR" },
+    "ui": { "tbd": "A DEFINIR", "reset": "REINICIAR", "match_label": "JOGO", "tracker": "SIMULADOR", "ready": "P1 PRONTO", "reset_confirm": "Reiniciar torneio?", "select_venue": "ESCOLHA A SEDE:", "all_dates": "TODAS AS DATAS", "all_venues": "TODAS AS SEDES", "all_groups": "TODOS OS GRUPOS", "all_teams": "TODAS AS SELEÇÕES", "filter_by": "FILTRAR POR DATA:", "filter_group": "FILTRAR POR GRUPO:", "filter_team": "FILTRAR POR SELEÇÃO:", "machine_error": "ERRO NA MÁQUINA", "system_malfunction": "FALHA NO SISTEMA", "contact_operator": "CONTATE O OPERADOR", "mode_official": "OFICIAL", "mode_simulation": "SIMULADOR", "swipe_to_view": "DESLIZE PARA NAVEGAR" },
     "standings": {
       "pos": "POS",
       "team": "SELEÇÃO",
