@@ -40,7 +40,13 @@
                   </div>
                   <span>{match.team1.code}</span>
                 </div>
-                <span class="bracket-score">{match.played ? match.team1.score : '-'}</span>
+                <span class="bracket-score">
+                  {#if match.played}
+                    {match.team1.score}{#if match.team1.penalties || match.team2.penalties}<span class="penalty-score">({match.team1.penalties})</span>{/if}
+                  {:else}
+                    -
+                  {/if}
+                </span>
               </div>
 
               <div class="bracket-team" class:winner={isWinner(match, match.team2.code)}>
@@ -50,7 +56,13 @@
                   </div>
                   <span>{match.team2.code}</span>
                 </div>
-                <span class="bracket-score">{match.played ? match.team2.score : '-'}</span>
+                <span class="bracket-score">
+                  {#if match.played}
+                    {match.team2.score}{#if match.team1.penalties || match.team2.penalties}<span class="penalty-score">({match.team2.penalties})</span>{/if}
+                  {:else}
+                    -
+                  {/if}
+                </span>
               </div>
             </div>
           {/each}

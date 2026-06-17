@@ -229,8 +229,14 @@
 .bracket-score {
   font-weight: bold;
   color: var(--arcade-neon);
-  min-width: 15px;
+  min-width: 20px;
   text-align: right;
+  white-space: nowrap;
+}
+
+.penalty-score {
+  color: var(--arcade-accent);
+  margin-left: 2px;
 }
 
 .bracket-team.winner {
