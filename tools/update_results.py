@@ -9,6 +9,7 @@ Manual CLI tool to update src/data_official.json
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_PATH = os.path.join(BASE_DIR, 'src', 'data.json')
+I18N_PATH = os.path.join(BASE_DIR, 'src', 'i18n.json')
 OFFICIAL_PATH = os.path.join(BASE_DIR, 'src', 'data_official.json')
 
 def get_local_date_str(iso_str):
@@ -39,7 +40,12 @@ def load_json(path):
 
 def save_json(path, data):
     with open(path, 'w', encoding='utf-8') as f:
-        json.dump(data, f)
+        f.write("[\n")
+        for i, item in enumerate(data):
+            if i > 0:
+                f.write(",\n")
+            f.write(f"  {json.dumps(item)}")
+        f.write("\n]\n")
 
 def main():
     print("="*40)
@@ -56,7 +62,9 @@ def main():
 
     # 2. Load Data
     data = load_json(DATA_PATH)
+    i18n = load_json(I18N_PATH)
     official = load_json(OFFICIAL_PATH)
+    en_teams = i18n.get('en', {}).get('teams', {})
     
     # Flatten all match stages to find matches on this date
     all_matches = []
@@ -79,14 +87,18 @@ def main():
         print("-"*30)
         
         # Team 1 Input
-        print(f"TEAM 1: {m['team1']['code']}")
+        t1_code = m['team1']['code']
+        t1_name = en_teams.get(t1_code, t1_code)
+        print(f"TEAM 1: {t1_name}")
         t1_score = get_valid_int("  Score")
         t1_yc = get_valid_int("  Yellow Cards")
         t1_rc = get_valid_int("  Red Cards")
         t1_pk = 0
         
         # Team 2 Input
-        print(f"\nTEAM 2: {m['team2']['code']}")
+        t2_code = m['team2']['code']
+        t2_name = en_teams.get(t2_code, t2_code)
+        print(f"\nTEAM 2: {t2_name}")
         t2_score = get_valid_int("  Score")
         t2_yc = get_valid_int("  Yellow Cards")
         t2_rc = get_valid_int("  Red Cards")
@@ -95,8 +107,8 @@ def main():
         # Handle Penalties for Knockouts
         if m['id'] > 72 and t1_score == t2_score:
             print("\n[ PENALTY SHOOTOUT REQUIRED ]")
-            t1_pk = get_valid_int(f"  {m['team1']['code']} PKS")
-            t2_pk = get_valid_int(f"  {m['team2']['code']} PKS")
+            t1_pk = get_valid_int(f"  {t1_name} PKS")
+            t2_pk = get_valid_int(f"  {t2_name} PKS")
 
         result = {
             "id": m['id'],
@@ -121,7 +133,9 @@ def main():
     print("SUMMARY OF ENTRIES:")
     for r in new_results:
         m_info = next(m for m in daily_matches if m['id'] == r['id'])
-        print(f" Match {r['id']}: {m_info['team1']['code']} {r['team1']['score']} - {r['team2']['score']} {m_info['team2']['code']}")
+        t1_name = en_teams.get(m_info['team1']['code'], m_info['team1']['code'])
+        t2_name = en_teams.get(m_info['team2']['code'], m_info['team2']['code'])
+        print(f" Match {r['id']}: {t1_name} {r['team1']['score']} - {r['team2']['score']} {t2_name}")
 
     confirm = input("\nCONFIRM SAVE? (Y/N): ").strip().upper()
     
