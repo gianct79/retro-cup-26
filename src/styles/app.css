@@ -279,9 +279,6 @@
 }
 
 .match-card-reset-btn {
-  position: absolute;
-  top: 8px;
-  right: 8px;
   background: transparent;
   border: 1px solid var(--arcade-red);
   color: var(--arcade-red);
@@ -312,7 +309,21 @@
   background: rgba(var(--arcade-neon-rgb), 0.03);
 }
 
-.match-meta {
+.match-header-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.match-id-label {
+  font-size: 9px;
+  color: var(--arcade-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.match-sub-meta {
   font-size: 9px;
   color: var(--arcade-accent);
   margin-bottom: 8px;

@@ -10,13 +10,16 @@
 </script>
 
 <div class="match-card">
-  {#if !isReadOnly && match.played}
-    <button type="button" class="match-card-reset-btn" onclick={() => onReset(match.id)}>
-      {t.ui.reset}
-    </button>
-  {/if}
-  <div class="match-meta">
-    {t.ui.match_label} #{match.id} // {formatDate(match.date)} // {venues[match.venue] || match.venue}
+  <div class="match-header-meta">
+    <span class="match-id-label">{t.ui.match_label} #{match.id}</span>
+    {#if !isReadOnly && match.played}
+      <button type="button" class="match-card-reset-btn" onclick={() => onReset(match.id)}>
+        {t.ui.reset}
+      </button>
+    {/if}
+  </div>
+  <div class="match-sub-meta">
+    {formatDate(match.date)} // {venues[match.venue] || match.venue}
   </div>
   
   <div class="match-teams {match.id > 72 ? 'knockout-teams' : ''}">
