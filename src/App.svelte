@@ -105,7 +105,6 @@
       b.pts - a.pts ||
       b.gd - a.gd ||
       b.gf - a.gf ||
-      (b.w || 0) - (a.w || 0) || // FIFA Tie-breaker: Number of wins
       ((b.yc * -1) + (b.rc * -3)) - ((a.yc * -1) + (a.rc * -3)) ||
       // Safe access in case a team rank is missing during an update
       ((initialData.teams[a.code]?.rank || 999) - (initialData.teams[b.code]?.rank || 999))
@@ -342,12 +341,105 @@
     );
   });
 
+  function resolveGroupStandings(teamCodes, liveStandings, groupMatches) {
+    const teams = teamCodes.map(code => liveStandings[code]);
+    
+    // Helper to recursively sort a subset of teams that are tied on points
+    function sortSubset(subset) {
+      if (subset.length <= 1) return subset;
+      
+      // H2H mini-table logic (works for any subset size >= 2, including 2, 3, or 4 teams)
+      const codes = subset.map(t => t.code);
+      const miniStats = {};
+      codes.forEach(code => {
+        miniStats[code] = { pts: 0, gd: 0, gf: 0 };
+      });
+      
+      groupMatches.forEach(m => {
+        if (codes.includes(m.team1.code) && codes.includes(m.team2.code)) {
+          const c1 = m.team1.code;
+          const c2 = m.team2.code;
+          const s1 = m.team1.score;
+          const s2 = m.team2.score;
+          
+          miniStats[c1].gf += s1;
+          miniStats[c2].gf += s2;
+          miniStats[c1].gd += (s1 - s2);
+          miniStats[c2].gd += (s2 - s1);
+          
+          if (s1 > s2) miniStats[c1].pts += 3;
+          else if (s2 > s1) miniStats[c2].pts += 3;
+          else {
+            miniStats[c1].pts += 1;
+            miniStats[c2].pts += 1;
+          }
+        }
+      });
+      
+      const sortedSubset = [...subset].sort((a, b) => {
+        const statsA = miniStats[a.code];
+        const statsB = miniStats[b.code];
+        return (
+          statsB.pts - statsA.pts ||
+          statsB.gd - statsA.gd ||
+          statsB.gf - statsA.gf
+        );
+      });
+      
+      // Group remaining ties to resolve recursively
+      const groups = [];
+      let currentGroup = [sortedSubset[0]];
+      for (let i = 1; i < sortedSubset.length; i++) {
+        const prev = sortedSubset[i - 1];
+        const curr = sortedSubset[i];
+        const sPrev = miniStats[prev.code];
+        const sCurr = miniStats[curr.code];
+        if (sPrev.pts === sCurr.pts && sPrev.gd === sCurr.gd && sPrev.gf === sCurr.gf) {
+          currentGroup.push(curr);
+        } else {
+          groups.push(currentGroup);
+          currentGroup = [curr];
+        }
+      }
+      groups.push(currentGroup);
+      
+      if (groups.length === 1) {
+        return [...subset].sort(compareTeams);
+      }
+      
+      let resolved = [];
+      groups.forEach(g => {
+        resolved = resolved.concat(sortSubset(g));
+      });
+      return resolved;
+    }
+    
+    // Group by overall points first
+    const pointsGroups = {};
+    teams.forEach(t => {
+      pointsGroups[t.pts] = pointsGroups[t.pts] || [];
+      pointsGroups[t.pts].push(t);
+    });
+    
+    const sortedPoints = Object.keys(pointsGroups).map(Number).sort((a, b) => b - a);
+    let finalStandings = [];
+    sortedPoints.forEach(pts => {
+      finalStandings = finalStandings.concat(sortSubset(pointsGroups[pts]));
+    });
+    return finalStandings;
+  }
+
   let groupsWithStandings = $derived.by(() => {
     const result = {};
     Object.keys(initialData.groups).forEach(name => {
-      result[name] = initialData.groups[name]
-        .map(code => liveStandings[code])
-        .sort(compareTeams);
+      const teamCodes = initialData.groups[name];
+      const groupMatches = matches.filter(m => 
+        m.id <= 72 && 
+        m.played &&
+        teamCodes.includes(m.team1.code) && 
+        teamCodes.includes(m.team2.code)
+      );
+      result[name] = resolveGroupStandings(teamCodes, liveStandings, groupMatches);
     });
     return result;
   });
