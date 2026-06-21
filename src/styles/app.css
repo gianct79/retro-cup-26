@@ -269,12 +269,41 @@
 }
 
 .match-card {
+  position: relative;
   background: var(--arcade-bg);
   border: 3px solid var(--arcade-text);
   padding: 12px;
   margin-bottom: 12px;
   box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.5);
   transition: all 0.2s;
+}
+
+.match-card-reset-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: transparent;
+  border: 1px solid var(--arcade-red);
+  color: var(--arcade-red);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  cursor: pointer;
+  padding: 4px 6px;
+  transition: all 0.2s;
+  text-transform: uppercase;
+}
+
+@media (hover: hover) {
+  .match-card-reset-btn:hover:not(:disabled) {
+    background: var(--arcade-red);
+    color: var(--arcade-white);
+    box-shadow: 0 0 8px var(--arcade-red);
+  }
+}
+
+.match-card-reset-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .match-card:hover {

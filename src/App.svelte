@@ -209,6 +209,23 @@
     }
   }
 
+  function resetMatchData(matchId) {
+    if (appMode === 'official')
+      return;
+    const match = matches.find(m => m.id === matchId);
+    if (match) {
+      match.played = false;
+      ['team1', 'team2'].forEach(tKey => {
+        if (match[tKey]) {
+          match[tKey].score = 0;
+          match[tKey].yellow_cards = 0;
+          match[tKey].red_cards = 0;
+          match[tKey].penalties = 0;
+        }
+      });
+    }
+  }
+
   // --- COMPUTED STANDINGS ---
   let liveStandings = $derived.by(() => {
     const stats = {};
@@ -642,6 +659,7 @@
             {teamCodes} 
             venues={initialData.venues} 
             onUpdate={updateMatchData} 
+            onReset={resetMatchData} 
             isReadOnly={appMode === 'official'}
             {formatDate} 
           />

@@ -1,7 +1,7 @@
 <script>
   import PixelFlag from './PixelFlag.svelte';
   
-  let { match, t, teamCodes, venues, onUpdate, formatDate, isReadOnly = false } = $props();
+  let { match, t, teamCodes, venues, onUpdate, onReset, formatDate, isReadOnly = false } = $props();
 
   function handleStat(teamKey, statKey, delta) {
     if (isReadOnly) return;
@@ -10,6 +10,11 @@
 </script>
 
 <div class="match-card">
+  {#if !isReadOnly && match.played}
+    <button type="button" class="match-card-reset-btn" onclick={() => onReset(match.id)}>
+      {t.ui.reset}
+    </button>
+  {/if}
   <div class="match-meta">
     {t.ui.match_label} #{match.id} // {formatDate(match.date)} // {venues[match.venue] || match.venue}
   </div>
