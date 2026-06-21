@@ -335,22 +335,30 @@
     return result;
   });
 
-  // --- KNOCKOUT DERIVATION ---
-  let qualifiersData = $derived.by(() => {
-    const top2 = {};
+  // Derive sorted list of all 3rd place teams to avoid duplicate sorting
+  let sortedThirdPlaceTeams = $derived.by(() => {
     const thirds = [];
     Object.keys(groupsWithStandings).forEach(name => {
       const g = groupsWithStandings[name];
-      top2[`1${name}`] = g[0]?.code || 'TBD';
-      top2[`2${name}`] = g[1]?.code || 'TBD';
       if (g[2]) {
         // We need to keep track of the origin group for the allocation lookup
         thirds.push({ ...g[2], originGroup: name });
       }
     });
+    return thirds.sort(compareTeams);
+  });
 
-    // Sort and pick best 8 third-place teams
-    const sortedThirds = thirds.sort(compareTeams).slice(0, 8);
+  // --- KNOCKOUT DERIVATION ---
+  let qualifiersData = $derived.by(() => {
+    const top2 = {};
+    Object.keys(groupsWithStandings).forEach(name => {
+      const g = groupsWithStandings[name];
+      top2[`1${name}`] = g[0]?.code || 'TBD';
+      top2[`2${name}`] = g[1]?.code || 'TBD';
+    });
+
+    // Pick best 8 third-place teams from the derived sorted list
+    const sortedThirds = sortedThirdPlaceTeams.slice(0, 8);
     
     // Determine the combination of groups (sorted alphabetically for lookup key)
     const comboKey = sortedThirds.map(t => t.originGroup).sort().join('');
@@ -431,13 +439,8 @@
 
   // Map to store the rank (1-8) of the qualifying third-place teams
   let bestThirdsRankMap = $derived.by(() => {
-    const thirds = [];
-    Object.keys(groupsWithStandings).forEach(name => {
-      if (groupsWithStandings[name][2]) thirds.push(groupsWithStandings[name][2]);
-    });
-    const sorted = thirds.sort(compareTeams).slice(0, 8);
     const map = {};
-    sorted.forEach((t, i) => map[t.code] = i + 1);
+    sortedThirdPlaceTeams.slice(0, 8).forEach((t, i) => map[t.code] = i + 1);
     return map;
   });
 
