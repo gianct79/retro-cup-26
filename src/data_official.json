@@ -96,5 +96,7 @@
   {"id": 95, "played": true, "team1": {"score": 3, "yellow_cards": 0, "red_cards": 0, "penalties": 0}, "team2": {"score": 2, "yellow_cards": 4, "red_cards": 0, "penalties": 0}},
   {"id": 96, "played": true, "team1": {"score": 0, "yellow_cards": 3, "red_cards": 0, "penalties": 4}, "team2": {"score": 0, "yellow_cards": 2, "red_cards": 0, "penalties": 3}},
   {"id": 97, "played": true, "team1": {"score": 2, "yellow_cards": 0, "red_cards": 0, "penalties": 0}, "team2": {"score": 0, "yellow_cards": 1, "red_cards": 0, "penalties": 0}},
-  {"id": 98, "played": true, "team1": {"score": 2, "yellow_cards": 2, "red_cards": 0, "penalties": 0}, "team2": {"score": 1, "yellow_cards": 2, "red_cards": 0, "penalties": 0}}
+  {"id": 98, "played": true, "team1": {"score": 2, "yellow_cards": 2, "red_cards": 0, "penalties": 0}, "team2": {"score": 1, "yellow_cards": 2, "red_cards": 0, "penalties": 0}},
+  {"id": 99, "played": true, "team1": {"score": 1, "yellow_cards": 1, "red_cards": 0, "penalties": 0}, "team2": {"score": 2, "yellow_cards": 0, "red_cards": 0, "penalties": 0}},
+  {"id": 100, "played": true, "team1": {"score": 3, "yellow_cards": 3, "red_cards": 0, "penalties": 0}, "team2": {"score": 1, "yellow_cards": 1, "red_cards": 1, "penalties": 0}}
 ]
