@@ -958,6 +958,48 @@
     display: none;
   }
 
+  /* Team Stats Table Mobile Adjustments */
+  .stats-table {
+    font-size: 8px;
+  }
+
+  .stats-table th:nth-child(1),
+  .stats-table td:nth-child(1) {
+    width: 25px;
+  }
+
+  .stats-table th:nth-child(3),
+  .stats-table td:nth-child(3) {
+    width: 25px;
+  }
+
+  .stats-table th:nth-child(4),
+  .stats-table td:nth-child(4) {
+    width: 35px;
+  }
+
+  .stats-table th:nth-child(5),
+  .stats-table td:nth-child(5) {
+    width: 65px;
+  }
+
+  .stats-table th:nth-child(8),
+  .stats-table td:nth-child(8),
+  .stats-table th:nth-child(9),
+  .stats-table td:nth-child(9),
+  .stats-table th:nth-child(10),
+  .stats-table td:nth-child(10) {
+    width: 30px;
+  }
+
+  /* Hide GF (GP) and GA (GC) on mobile portrait to make room for TEAM and GAME columns */
+  .stats-table th:nth-child(6),
+  .stats-table td:nth-child(6),
+  .stats-table th:nth-child(7),
+  .stats-table td:nth-child(7) {
+    display: none;
+  }
+
   input[type='number'] {
     width: 50px;
     height: 35px;
