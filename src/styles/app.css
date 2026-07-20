@@ -990,3 +990,68 @@
     padding: 6px 8px;
   }
 }
+
+/* ============================================================================
+   TEAM STATS TABLE
+   ============================================================================ */
+
+.team-stats-container {
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+.table-scroll-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 2px solid var(--arcade-text);
+  background: var(--arcade-bg);
+}
+
+.stats-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.stats-table th:nth-child(1) { width: 35px; } /* # */
+.stats-table th:nth-child(2) { width: auto; } /* TEAM */
+.stats-table th:nth-child(3) { width: 45px; } /* MP */
+.stats-table th:nth-child(4) { width: 50px; } /* PTS */
+.stats-table th:nth-child(5) { width: 95px; } /* W-D-L */
+.stats-table th:nth-child(6) { width: 45px; } /* GF */
+.stats-table th:nth-child(7) { width: 45px; } /* GA */
+.stats-table th:nth-child(8) { width: 45px; } /* GD */
+.stats-table th:nth-child(9) { width: 45px; } /* YC / CA */
+.stats-table th:nth-child(10) { width: 45px; } /* RC / CV */
+
+.sortable-th {
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s, color 0.2s;
+  white-space: nowrap;
+}
+
+@media (hover: hover) {
+  .sortable-th:hover {
+    background-color: rgba(var(--arcade-neon-rgb), 0.2);
+    color: var(--arcade-white);
+  }
+}
+
+.sort-icon {
+  display: inline-block;
+  font-size: 8px;
+  color: var(--arcade-accent);
+  margin-left: 2px;
+}
+
+.text-left {
+  text-align: left !important;
+}
+
+.gd-positive {
+  color: #39ff14;
+}
+
+.gd-negative {
+  color: var(--arcade-red);
+}

@@ -9,6 +9,7 @@
   import MatchCard from './components/MatchCard.svelte';
   import StandingsTable from './components/StandingsTable.svelte';
   import Bracket from './components/Bracket.svelte';
+  import TeamStatsTable from './components/TeamStatsTable.svelte';
 
   // --- STATE (RUNES) ---
   const STORAGE_KEY = 'retro_cup_26';
@@ -652,6 +653,65 @@
     });
   });
 
+  let allTournamentStats = $derived.by(() => {
+    const stats = {};
+    Object.keys(initialData.teams).forEach(code => {
+      stats[code] = {
+        code,
+        name: t.teams[code] || code,
+        mp: 0, pts: 0, gf: 0, ga: 0, gd: 0, yc: 0, rc: 0, w: 0, d: 0, l: 0
+      };
+    });
+
+    const allMatches = [
+      ...matches.filter(m => m.id <= 72),
+      ...r32Matches,
+      ...r16Matches,
+      ...qfMatches,
+      ...sfMatches,
+      ...thirdMatch,
+      ...finalMatch
+    ];
+
+    allMatches.forEach(m => {
+      if (!m || !m.played) return;
+      const t1 = stats[m.team1.code];
+      const t2 = stats[m.team2.code];
+      if (!t1 || !t2) return;
+
+      t1.mp++; t2.mp++;
+      t1.gf += (m.team1.score || 0); t1.ga += (m.team2.score || 0);
+      t2.gf += (m.team2.score || 0); t2.ga += (m.team1.score || 0);
+      t1.yc += (m.team1.yellow_cards || 0); t1.rc += (m.team1.red_cards || 0);
+      t2.yc += (m.team2.yellow_cards || 0); t2.rc += (m.team2.red_cards || 0);
+
+      const s1 = m.team1.score || 0;
+      const s2 = m.team2.score || 0;
+
+      if (s1 > s2) {
+        t1.pts += 3; t1.w++; t2.l++;
+      } else if (s2 > s1) {
+        t2.pts += 3; t2.w++; t1.l++;
+      } else {
+        const p1 = m.team1.penalties || 0;
+        const p2 = m.team2.penalties || 0;
+        if (p1 > p2) {
+          t1.pts += 3; t1.w++; t2.l++;
+        } else if (p2 > p1) {
+          t2.pts += 3; t2.w++; t1.l++;
+        } else {
+          t1.pts += 1; t2.pts += 1;
+          t1.d++; t2.d++;
+        }
+      }
+
+      t1.gd = t1.gf - t1.ga;
+      t2.gd = t2.gf - t2.ga;
+    });
+
+    return Object.values(stats);
+  });
+
 </script>
 
 {#snippet globalFiltersUI()}
@@ -706,6 +766,9 @@
       </button>
       <button class:active-btn={currentTab === 'standings'} onclick={() => currentTab = 'standings'}>
         [ {tabLabels.standings} ]
+      </button>
+      <button class:active-btn={currentTab === 'stats'} onclick={() => currentTab = 'stats'}>
+        [ {tabLabels.stats} ]
       </button>
       <button class:active-btn={currentTab === 'bracket'} onclick={() => currentTab = 'bracket'}>
         [ {tabLabels.bracket} ]
@@ -766,6 +829,12 @@
           {teamCodes} 
         />
       </div>
+    {:else if currentTab === 'stats'}
+      <TeamStatsTable
+        stats={allTournamentStats}
+        {t}
+        {teamCodes}
+      />
     {:else}
       <div class="standings-container">
         {#each Object.entries(groupsWithStandings) as [groupName, teams]}
