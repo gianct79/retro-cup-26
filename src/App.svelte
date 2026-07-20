@@ -693,16 +693,8 @@
       } else if (s2 > s1) {
         t2.pts += 3; t2.w++; t1.l++;
       } else {
-        const p1 = m.team1.penalties || 0;
-        const p2 = m.team2.penalties || 0;
-        if (p1 > p2) {
-          t1.pts += 3; t1.w++; t2.l++;
-        } else if (p2 > p1) {
-          t2.pts += 3; t2.w++; t1.l++;
-        } else {
-          t1.pts += 1; t2.pts += 1;
-          t1.d++; t2.d++;
-        }
+        t1.pts += 1; t2.pts += 1;
+        t1.d++; t2.d++;
       }
 
       t1.gd = t1.gf - t1.ga;
